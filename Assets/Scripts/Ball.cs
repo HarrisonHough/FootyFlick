@@ -9,8 +9,10 @@ public class Ball : MonoBehaviour
     [SerializeField]
     private float spinSpeed = 10f; 
     private Vector3 windDirection = new Vector3(1,0,0);
-    
     private bool windActive;
+    
+    private GoalPostCollisionType goalPostCollisionType;
+    private bool disableScoring;
     
     private void Start()
     {
@@ -20,8 +22,6 @@ public class Ball : MonoBehaviour
         }
         DeactivateRigidbody();
     }
-    
-
     
     public void SetWindActive(bool active)
     {
@@ -59,8 +59,28 @@ public class Ball : MonoBehaviour
     {
         //TODO: check if we need to use tags or layers to identify certain objects
         SetWindActive(false);
+        
+        if(collision.gameObject.TryGetComponent(out GoalPost goalPost))
+        {
+            switch(goalPost.CollisionType)
+            {
+                case GoalPostCollisionType.Goal:
+                    goalPostCollisionType = GoalPostCollisionType.Goal;
+                    break;
+                case GoalPostCollisionType.Point:
+                    Debug.Log("Point!");
+                    break;
+                case GoalPostCollisionType.None:
+                    break;
+            }
+        }
     }
-    
+
+    private void OnTriggerEnter(Collider other)
+    {
+        
+    }
+
     public void DeactivateRigidbody()
     {
         ballRigidbody.useGravity = false;
