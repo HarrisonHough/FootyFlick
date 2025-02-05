@@ -159,14 +159,14 @@ public class BallLauncher : MonoBehaviour
         var direction3D = new Vector3(dragDirection.x, 0, dragDirection.y).normalized;
 
         if (ball == null) SpawnBall();
-        arrowIndicator.transform.position = ball.transform.position;
         arrowIndicator.transform.rotation = Quaternion.LookRotation(direction3D);
-        arrowIndicator.transform.localScale = new Vector3(1, 1, dragMagnitude * 2);
+        var scale = dragMagnitude * 3;
+        arrowIndicator.transform.localScale = new Vector3(scale, scale, scale);
     }
 
     private void RandomizeWindStrength()
     {
-        windStrength = Random.Range(-10f, 10f);
+        windStrength = Random.Range(-6f, 6f);
         OnWindChanged?.Invoke(windStrength);
     }
 
