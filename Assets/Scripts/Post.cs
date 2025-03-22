@@ -1,16 +1,9 @@
 using UnityEngine;
-public enum GoalPostCollisionType
-{
-    None,
-    Goal,
-    Point
-}
 
-public class GoalPost : MonoBehaviour
+public class GoalPost : MonoBehaviour, IGoalPost
 {
     [SerializeField]
-    private GoalPostCollisionType goalPostCollisionType = GoalPostCollisionType.Goal;
-    
-    public GoalPostCollisionType CollisionType => goalPostCollisionType;
-    
+    private GoalPostType goalPostType;
+
+    public GoalPostType GoalPostType => goalPostType;
 }

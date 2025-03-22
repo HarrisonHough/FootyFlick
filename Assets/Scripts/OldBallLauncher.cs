@@ -168,6 +168,7 @@ public enum ControlMode { Swipe, Drag }
     private void RandomizeWindStrength()
     {
         windStrength = UnityEngine.Random.Range(-6f, 6f);
+        ball.SetWind(windStrength, cameraTransform.right);
         OnWindChanged?.Invoke(windStrength);
     }
 
