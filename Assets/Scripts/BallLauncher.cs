@@ -1,29 +1,45 @@
 using System;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using UnityEngine.InputSystem;
 
 public class BallLauncher : MonoBehaviour
 {
-    public enum ControlMode { Swipe, Drag }
-
     [SerializeField] private Ball ballPrefab;
     [SerializeField] private Transform target;
     [SerializeField] private Transform cameraTransform;
     [SerializeField] private float launchAngle = 45f;
-    [SerializeField] private float gravity = 9.8f;
-    [SerializeField] private float minForceMultiplier = 0.8f; // Adjust to make shots possible but challenging
-    [SerializeField] private float maxForceMultiplier = 1.2f; // Allows overshooting
+    [SerializeField] private float maxLaunchForce = 10f;
+    [SerializeField] private float maxSwipeDistance = 0.5f; // Proportion of screen height
     [SerializeField] private GameObject arrowIndicator;
+    [SerializeField] private float windStrengthRange = 6f; // Maximum wind strength
+    [SerializeField] private float windChangeInterval = 5f; // Time in seconds between wind changes
 
-    private float windStrength;
     private Ball ball;
     private Vector2 startTouch, endTouch, currentDrag;
     private bool isDragging;
-    private float idealLaunchForce;
+    private float windStrength;
+    private Vector3 windDirection;
+    private GameInputActions inputActions;
+    private float windTimer;
 
     public static Action<float> OnWindChanged;
-    [SerializeField]
-    private ControlMode currentControlMode = ControlMode.Swipe;
+
+    private void Awake()
+    {
+        inputActions = new GameInputActions();
+        inputActions.PlayerControls.TouchPress.started += OnTouchPressStarted;
+        inputActions.PlayerControls.TouchPress.canceled += OnTouchPressCanceled;
+    }
+
+    private void OnEnable()
+    {
+        inputActions.Enable();
+    }
+
+    private void OnDisable()
+    {
+        inputActions.Disable();
+    }
 
     private void Start()
     {
@@ -33,140 +49,114 @@ public class BallLauncher : MonoBehaviour
 
     private void Update()
     {
-        if (currentControlMode == ControlMode.Swipe)
+        if (isDragging)
         {
-            HandleSwipeInput();
-        }
-        else if (currentControlMode == ControlMode.Drag)
-        {
-            HandleDragInput();
-        }
-    }
-
-    private void HandleSwipeInput()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            startTouch = Input.mousePosition;
-            if (ball == null) SpawnBall();
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            endTouch = Input.mousePosition;
-            idealLaunchForce = CalculateIdealLaunchForce(); // Update force range before launching
-            LaunchBall(CalculateSwipeVelocity());
-        }
-    }
-
-    private void HandleDragInput()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            startTouch = Input.mousePosition;
-            isDragging = true;
-            arrowIndicator.SetActive(true);
-        }
-
-        if (Input.GetMouseButton(0) && isDragging)
-        {
-            currentDrag = (Vector2)Input.mousePosition - startTouch;
+            currentDrag = inputActions.PlayerControls.TouchPosition.ReadValue<Vector2>() - startTouch;
             UpdateArrowIndicator();
         }
 
-        if (Input.GetMouseButtonUp(0) && isDragging)
+        // Update wind strength at intervals
+        windTimer += Time.deltaTime;
+        if (windTimer >= windChangeInterval)
         {
-            isDragging = false;
-            arrowIndicator.SetActive(false);
-            idealLaunchForce = CalculateIdealLaunchForce(); // Update force range before launching
-            LaunchBall(CalculateDragVelocity());
+            RandomizeWindStrength();
+            windTimer = 0f;
         }
     }
 
-    private void LaunchBall(Vector3 velocity)
+    private void OnTouchPressStarted(InputAction.CallbackContext context)
     {
+        startTouch = inputActions.PlayerControls.TouchPosition.ReadValue<Vector2>();
         if (ball == null) SpawnBall();
 
-        ball.LaunchBall(velocity);
-        ball.SetWind(windStrength, cameraTransform.right);
-        ball.SetWindActive(true);
-        ball = null;
-        RandomizeWindStrength();
+        isDragging = true;
+        arrowIndicator.SetActive(true);
     }
 
-    private float CalculateIdealLaunchForce()
+    private void OnTouchPressCanceled(InputAction.CallbackContext context)
     {
-        var startPos = transform.position;
-        var targetPos = target.position;
-        var dx = Vector3.Distance(new Vector3(targetPos.x, 0, targetPos.z), new Vector3(startPos.x, 0, startPos.z));
-        var dy = targetPos.y - startPos.y;
+        endTouch = inputActions.PlayerControls.TouchPosition.ReadValue<Vector2>();
 
-        var angleRad = launchAngle * Mathf.Deg2Rad;
-        var v = Mathf.Sqrt((gravity * dx * dx) / (2 * Mathf.Cos(angleRad) * Mathf.Cos(angleRad) * (dx * Mathf.Tan(angleRad) - dy)));
+        if (isDragging)
+        {
+            isDragging = false;
+            arrowIndicator.SetActive(false);
+            Vector3 launchVelocity = CalculateLaunchVelocity();
 
-        return v; // This is the "ideal" force required to reach the target
+            // Launch the ball only if the velocity is non-zero
+            if (launchVelocity != Vector3.zero)
+            {
+                LaunchBall(launchVelocity);
+            }
+        }
     }
 
-    private Vector3 CalculateSwipeVelocity()
+    private Vector3 CalculateLaunchVelocity()
     {
-        // Get swipe distance as a percentage of screen height
-        var swipeDistance = (endTouch - startTouch).magnitude / Screen.height;
-        swipeDistance = Mathf.Clamp(swipeDistance, 0f, 1f); // Ensure it's within valid range
+        Vector2 swipeVector = endTouch - startTouch;
 
-        // Scale launch force within adjusted range (based on target distance)
-        var launchForce = Mathf.Lerp(idealLaunchForce * minForceMultiplier, idealLaunchForce * maxForceMultiplier, swipeDistance);
+        // Ignore swipes with an upward or neutral vertical component
+        if (swipeVector.y >= 0)
+        {
+            return Vector3.zero;
+        }
 
-        // Get swipe direction & normalize to 3D
-        var swipeDirection = (endTouch - startTouch).normalized;
-        var direction = new Vector3(swipeDirection.x, 0, swipeDirection.y).normalized;
+        // Calculate the swipe distance as a proportion of the screen height
+        float swipeDistance = Mathf.Clamp(swipeVector.magnitude / Screen.height, 0f, maxSwipeDistance);
 
-        // Apply launch angle for proper arc trajectory
-        var angleRad = launchAngle * Mathf.Deg2Rad;
-        var velocity = direction * launchForce * Mathf.Cos(angleRad); // Horizontal component
-        velocity.y = launchForce * Mathf.Sin(angleRad); // Vertical component
+        // Determine the launch force based on the swipe distance
+        float launchForce = swipeDistance / maxSwipeDistance * maxLaunchForce;
 
-        return velocity;
-    }
-    
-    private Vector3 CalculateDragVelocity()
-    {
-        if (currentDrag.magnitude < 10f) return Vector3.zero; // Ignore tiny drags
+        // Calculate the launch direction
+        Vector3 launchDirection = new Vector3(-swipeVector.x, 0, -swipeVector.y).normalized;
 
-        // Get drag distance as a percentage of screen height
-        var dragDistance = currentDrag.magnitude / Screen.height;
-        dragDistance = Mathf.Clamp(dragDistance, 0f, 1f);
-
-        // Scale launch force within adjusted range
-        var launchForce = Mathf.Lerp(idealLaunchForce * minForceMultiplier, idealLaunchForce * maxForceMultiplier, dragDistance);
-
-        // Convert 2D drag direction to 3D
-        var horizontalDirection = new Vector3(-currentDrag.normalized.x, 0, -currentDrag.normalized.y).normalized;
-
-        // Apply launch angle for arc trajectory
-        var angleRad = launchAngle * Mathf.Deg2Rad;
-        var velocity = horizontalDirection * launchForce * Mathf.Cos(angleRad);
+        // Apply the launch angle to determine the velocity components
+        float angleRad = launchAngle * Mathf.Deg2Rad;
+        Vector3 velocity = launchDirection * launchForce * Mathf.Cos(angleRad);
         velocity.y = launchForce * Mathf.Sin(angleRad);
 
         return velocity;
     }
-
-
+    
     private void UpdateArrowIndicator()
     {
-        var dragDirection = -currentDrag.normalized;
-        var dragMagnitude = Mathf.Clamp(currentDrag.magnitude / Screen.height, 0f, 1f);
+        Vector2 dragDirection = currentDrag.normalized;
 
-        var direction3D = new Vector3(dragDirection.x, 0, dragDirection.y).normalized;
+        // Check if the swipe is backward (upward swipe in screen space)
+        if (dragDirection.y > 0)
+        {
+            // Hide the arrow indicator for backward swipes
+            arrowIndicator.SetActive(false);
+            return;
+        }
 
-        if (ball == null) SpawnBall();
+        // Show the arrow indicator for valid forward swipes
+        arrowIndicator.SetActive(true);
+
+        float dragMagnitude = Mathf.Clamp(currentDrag.magnitude / (Screen.height * maxSwipeDistance), 0f, 1f);
+
+        // Map downward drag to forward direction
+        Vector3 direction3D = new Vector3(-dragDirection.x, 0, -dragDirection.y).normalized;
+
         arrowIndicator.transform.rotation = Quaternion.LookRotation(direction3D);
-        var scale = dragMagnitude * 3;
+        float scale = dragMagnitude * 3; // Adjust the multiplier as needed
         arrowIndicator.transform.localScale = new Vector3(scale, scale, scale);
+    }
+    
+    private void LaunchBall(Vector3 velocity)
+    {
+        if (ball == null) SpawnBall();
+        ball.SetWind(windStrength, cameraTransform.right);
+        ball.SetWindActive(true);
+        ball.LaunchBall(velocity);
+        ball = null;
     }
 
     private void RandomizeWindStrength()
     {
-        windStrength = Random.Range(-6f, 6f);
+        windStrength = UnityEngine.Random.Range(-windStrengthRange, windStrengthRange);
+        windDirection.Normalize();
+
         OnWindChanged?.Invoke(windStrength);
     }
 
