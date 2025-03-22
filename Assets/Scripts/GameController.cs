@@ -1,28 +1,31 @@
-using System;
+using System.Collections;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    
-    [SerializeField] private Transform cameraTransform;
-    [SerializeField] private float windStrengthRange = 6f; 
-    [SerializeField] private float windChangeInterval = 5f;
-    
-    public static Action<WindData> OnWindChanged;
+    [SerializeField]
+    private PlayerController player;
+    [SerializeField]
+    private RandomPositionInSector randomPositionInSector;
     
     private void Start()
     {
-
+        Ball.OnBallScoreComplete += OnBallScoreComplete;
+    }
+    
+    public void OnBallScoreComplete(BallScoreData ballScoreData)
+    {
+        player.MoveToPosition(randomPositionInSector.GetRandomPositionInSector());
+        WindControl.Instance.RandomizeWindStrength();
+        if(ballScoreData.scoreType == ScoreType.Goal)
+        {
+            
+        }
     }
 
-    private void RandomizeWindStrength()
+    IEnumerator GameLoop()
     {
-        var windData = new WindData()
-        {
-            Force = UnityEngine.Random.Range(-windStrengthRange, windStrengthRange), 
-            Direction = cameraTransform.right.normalized
-        };
-        OnWindChanged?.Invoke(windData);
+        yield return null;
     }
 }
 

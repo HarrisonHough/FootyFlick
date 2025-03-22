@@ -3,11 +3,11 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class RandomPositionInSector : MonoBehaviour
 {
-    public float minRadius = 30f; // Minimum distance from the object's position
-    public float maxRadius = 50f; // Maximum distance from the object's position
-    public float minAngle = -45f; // Minimum angle in degrees
-    public float maxAngle = 45f;  // Maximum angle in degrees
-    public int segmentCount = 30; // Number of segments to draw the arc
+    public float minRadius = 30f;
+    public float maxRadius = 50f; 
+    public float minAngle = -45f; 
+    public float maxAngle = 45f;  
+    public int segmentCount = 30; 
     
     public Vector3 GetRandomPositionInSector(float? fixedAngle = null, float? fixedDistance = null)
     {

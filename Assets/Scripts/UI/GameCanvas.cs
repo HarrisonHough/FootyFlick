@@ -12,7 +12,7 @@ public class GameCanvas : MonoBehaviour
 
     private void Start()
     {
-        Ball.OnScore += OnScore;
+        Ball.OnBallScoreComplete += OnScore;
         PlayerScore.OnScoreUpdated += OnScoreUpdated;
     }
 
@@ -63,7 +63,7 @@ public class GameCanvas : MonoBehaviour
 
     public void OnDestroy()
     {
-        Ball.OnScore -= OnScore;
+        Ball.OnBallScoreComplete -= OnScore;
     }
     
     IEnumerator DelayClearNotificationText(float delay)

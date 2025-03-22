@@ -9,19 +9,20 @@ public class BallLauncher : MonoBehaviour
     [SerializeField] private float launchAngle = 45f;
     [SerializeField] private float maxLaunchForce = 10f;
     [SerializeField] private float maxSwipeDistance = 0.5f; // Proportion of screen height
-    [SerializeField] private float windStrengthRange = 6f; // Maximum wind strength
-
+    
     private Ball ball;
-    private float windStrength;
-    private float windTimer;
-
-    //public static Action<float> OnWindChanged;
     
     private void Start()
     {
         SpawnBall();
+        Ball.OnBallScoreComplete += OnBallScoreComplete;
     }
-    
+
+    private void OnBallScoreComplete(BallScoreData obj)
+    {
+        if (ball == null) SpawnBall();
+    }
+
     public void OnSwipeDetected(SwipeData swipeData)
     {
         if (ball == null) return;
@@ -38,17 +39,25 @@ public class BallLauncher : MonoBehaviour
         }
 
         // Calculate the swipe distance as a proportion of the screen height
-        var clampedDistance = Mathf.Clamp(swipeData.Distance, 0f, maxSwipeDistance);
+        float clampedDistance = Mathf.Clamp(swipeData.Distance, 0f, maxSwipeDistance);
 
         // Determine the launch force based on the swipe distance
-        var launchForce = clampedDistance / maxSwipeDistance * maxLaunchForce;
+        float launchForce = clampedDistance / maxSwipeDistance * maxLaunchForce;
 
-        // Calculate the launch direction
-        var launchDirection = new Vector3(swipeData.SwipeVector.x, 0, swipeData.SwipeVector.y).normalized;
+        // Get the camera's forward direction, ignoring the y component
+        Vector3 cameraForward = cameraTransform.forward;
+        cameraForward.y = 0;
+        cameraForward.Normalize();
+
+        // Get the camera's right direction
+        Vector3 cameraRight = cameraTransform.right;
+
+        // Calculate the launch direction relative to the camera's orientation
+        Vector3 launchDirection = (cameraRight * swipeData.SwipeVector.x + cameraForward * swipeData.SwipeVector.y).normalized;
 
         // Apply the launch angle to determine the velocity components
-        var angleRad = launchAngle * Mathf.Deg2Rad;
-        var velocity = launchDirection * launchForce * Mathf.Cos(angleRad);
+        float angleRad = launchAngle * Mathf.Deg2Rad;
+        Vector3 velocity = launchDirection * launchForce * Mathf.Cos(angleRad);
         velocity.y = launchForce * Mathf.Sin(angleRad);
 
         return velocity;
@@ -57,21 +66,14 @@ public class BallLauncher : MonoBehaviour
     private void LaunchBall(Vector3 velocity)
     {
         if (ball == null) SpawnBall();
-        ball. SetWind(windStrength, cameraTransform.right.normalized);
-        ball.SetWindActive(true);
+        ball.transform.parent = null;
         ball.LaunchBall(velocity);
         ball = null;
     }
 
-    // private void RandomizeWindStrength()
-    // {
-    //     windStrength = UnityEngine.Random.Range(-windStrengthRange, windStrengthRange);
-    //     OnWindChanged?.Invoke(windStrength);
-    // }
-
     private void SpawnBall()
     {
-        ball = Instantiate(ballPrefab);
-        ball.transform.position = ballParent.transform.position;
+        ball = Instantiate(ballPrefab, ballParent.transform);
+        ball.transform.position = ballParent.position;
     }
 }

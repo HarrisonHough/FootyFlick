@@ -7,7 +7,7 @@ public class WindPanel : MonoBehaviour
 
     private void Awake()
     {
-        GameController.OnWindChanged += OnWindChanged;
+        WindControl.OnWindChanged += OnWindChanged;
     }
 
     public void OnWindChanged(WindData windData)

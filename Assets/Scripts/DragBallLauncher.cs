@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 
-public class OldBallLauncher : MonoBehaviour
+public class DragBallLauncher : MonoBehaviour
 {
 public enum ControlMode { Swipe, Drag }
 
@@ -98,7 +98,6 @@ public enum ControlMode { Swipe, Drag }
         if (ball == null) SpawnBall();
 
         ball.LaunchBall(velocity);
-        ball.SetWind(windStrength, cameraTransform.right);
         ball.SetWindActive(true);
         ball = null;
         RandomizeWindStrength();
@@ -168,7 +167,6 @@ public enum ControlMode { Swipe, Drag }
     private void RandomizeWindStrength()
     {
         windStrength = UnityEngine.Random.Range(-6f, 6f);
-        ball.SetWind(windStrength, cameraTransform.right);
         OnWindChanged?.Invoke(windStrength);
     }
 

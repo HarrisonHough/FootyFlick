@@ -10,7 +10,7 @@ public class PlayerScore : MonoBehaviour
 
     private void Start()
     {
-        Ball.OnScore += OnScore;
+        Ball.OnBallScoreComplete += OnScore;
     }
 
     private void OnScore(BallScoreData ballScoreData)

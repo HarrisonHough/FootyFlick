@@ -21,7 +21,7 @@ public class Ball : MonoBehaviour
     
     private BallScoreData _ballScoreData;
     
-    public static Action<BallScoreData> OnScore;
+    public static Action<BallScoreData> OnBallScoreComplete;
     
     private void Start()
     {
@@ -36,19 +36,16 @@ public class Ball : MonoBehaviour
     {
         windActive = active;
     }
-    
-    public void SetWind(float strength, Vector3 direction)
-    {
-        windStrength = strength;
-        windDirection = direction;
-    }
-    
+
     public void LaunchBall(Vector3 velocity)
     {
         _ballScoreData = new BallScoreData();
         ActivateRigidbody();
         ballRigidbody.linearVelocity = velocity;
         ballRigidbody.angularVelocity = transform.right * spinSpeed; // Backward spin
+        SetWindActive(true);
+        windStrength = WindControl.Instance.WindForce;
+        windDirection = WindControl.Instance.WindDirection;
         StartCoroutine(WaitForBallToStop());
     }
 
@@ -72,6 +69,7 @@ public class Ball : MonoBehaviour
         if (other.gameObject.TryGetComponent(out IScoreArea score))
         {
             _ballScoreData.scoreType = score.ScoreType;
+            disableScoring = true;
             switch (score.ScoreType)
             {
                 case ScoreType.OutOfBounds:
@@ -98,13 +96,15 @@ public class Ball : MonoBehaviour
             switch(goalPost.GoalPostType)
             {
                 case GoalPostType.Goal:
+                    disableScoring = true;
                     _ballScoreData.scoreType = ScoreType.Point;
-                    OnScore?.Invoke(_ballScoreData);
+                    OnBallScoreComplete?.Invoke(_ballScoreData);
                     StopAllCoroutines();
                     break;
                 case GoalPostType.Point:
+                    disableScoring = true;
                     _ballScoreData.scoreType = ScoreType.OutOfBounds;
-                    OnScore?.Invoke(_ballScoreData);
+                    OnBallScoreComplete?.Invoke(_ballScoreData);
                     StopAllCoroutines();
                     break;
                 case GoalPostType.None: default:
@@ -131,8 +131,8 @@ public class Ball : MonoBehaviour
     IEnumerator DelayCheckForScore(float delay)
     {
         yield return new WaitForSeconds(delay);
-        OnScore?.Invoke(_ballScoreData);
-        disableScoring = false;
+        OnBallScoreComplete?.Invoke(_ballScoreData);
+        disableScoring = true;
         StopAllCoroutines();
     }
 
@@ -147,7 +147,7 @@ public class Ball : MonoBehaviour
         }
 
         // Invoke the scoring event after the loop exits
-        OnScore?.Invoke(_ballScoreData);
-        disableScoring = false;
+        OnBallScoreComplete?.Invoke(_ballScoreData);
+        disableScoring = true;
     }
 }
