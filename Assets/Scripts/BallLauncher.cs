@@ -14,7 +14,6 @@ public class BallLauncher : MonoBehaviour
     public static Action OnBallLaunched;
     private void Start()
     {
-        SpawnBall();
         GameController.OnKickReady += OnKickReady;
     }
 

@@ -1,5 +1,5 @@
-using System;
 using System.Collections;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -9,6 +9,8 @@ public class GameCanvas : MonoBehaviour
     private TextMeshProUGUI notificationText;
     [SerializeField]
     private TextMeshProUGUI scoreText;
+    [SerializeField]
+    private WindPanel windPanel;
 
     private void Start()
     {
@@ -23,12 +25,27 @@ public class GameCanvas : MonoBehaviour
         Ball.OnBallScoreComplete -= OnScore;
         PlayerScore.OnScoreUpdated -= OnScoreUpdated;
         GameController.OnGameOver -= OnGameOver;
+        GameController.OnGameStart -= OnGameStart;
     }
     private void OnGameOver()
     {
-        gameObject.SetActive(false);
+        SetUIVisibility(false);
+    }
+
+    private void SetUIVisibility( bool isVisible)
+    {
+        windPanel.gameObject.SetActive(isVisible);
+        notificationText.gameObject.SetActive(isVisible);
+        scoreText.gameObject.SetActive(isVisible);
     }
     
+    private void ShowUI()
+    {
+        windPanel.gameObject.SetActive(false);
+        notificationText.gameObject.SetActive(false);
+        scoreText.gameObject.SetActive(false);
+    }
+
     private void OnGameStart()
     {
         ResetUI();
@@ -36,7 +53,16 @@ public class GameCanvas : MonoBehaviour
 
     private void OnScoreUpdated(PlayerScoreData playerScoreData)
     {
-        scoreText.text = playerScoreData.score.ToString();
+        if (playerScoreData.score == 0)
+        {
+            scoreText.text = playerScoreData.score.ToString();
+            return;
+        }
+        scoreText.rectTransform.DOScale( new Vector3(1.2f, 1.2f, 1.2f), 0.3f).OnComplete(() =>
+        {
+            scoreText.text = playerScoreData.score.ToString();
+            scoreText.rectTransform.DOScale( new Vector3(1f, 1f, 1f), 0.2f);
+        });
     }
 
     public void OnScore(BallScoreData ballScoreData)
@@ -56,7 +82,7 @@ public class GameCanvas : MonoBehaviour
                 notificationText.text = "GOAL!";
                 break;
             case ScoreType.OutOfBounds: 
-                notificationText.text = "OUT OF BOUNDS!";
+                notificationText.text = "OUT!";
                 break;
             case ScoreType.Point:
                 notificationText.text = "POINT!";
@@ -72,15 +98,20 @@ public class GameCanvas : MonoBehaviour
                 notificationText.text = "HIT THE POST!";
                 break;
             case GoalPostType.Point:
-                notificationText.text = "OUT OF BOUNDS!";
+                notificationText.text = "OUT!";
                 break;
         }
+        notificationText.rectTransform.DOScale( new Vector3(1.2f, 1.2f, 1.2f), 0.3f).OnComplete(() =>
+        {
+            notificationText.rectTransform.DOScale( new Vector3(1f, 1f, 1f), 0.2f);
+        });
         StopAllCoroutines();
         StartCoroutine(DelayClearNotificationText(2f));
     }
     
     private void ResetUI()
     {
+        SetUIVisibility(true);
         notificationText.text = "";
         scoreText.text = "0";
     }

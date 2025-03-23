@@ -42,6 +42,12 @@ public class Ball : MonoBehaviour
         }
         DeactivateRigidbody();
     }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     private void Reset()
     {
         SetWindActive(false);
@@ -60,6 +66,7 @@ public class Ball : MonoBehaviour
         {
             poolMember = GetComponent<PoolMember>();
         }
+        disableScoring = false;
         _ballScoreData = new BallScoreData();
         ActivateRigidbody();
         ballRigidbody.linearVelocity = velocity;
@@ -86,12 +93,11 @@ public class Ball : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (_ballScoreData.scoreType != ScoreType.None) return;
-        if (_ballScoreData.goalPostCollisionType != GoalPostType.None) return;
+        if (disableScoring || _ballScoreData.scoreType != ScoreType.None || _ballScoreData.goalPostCollisionType != GoalPostType.None) return;
+        
         if (other.gameObject.TryGetComponent(out IScoreArea score))
         {
             _ballScoreData.scoreType = score.ScoreType;
-            disableScoring = true;
             switch (score.ScoreType)
             {
                 case ScoreType.OutOfBounds:
@@ -105,13 +111,14 @@ public class Ball : MonoBehaviour
                     break;
             }
             // delay check to ensure ball didn't hit post shortly after entering trigger
-            StartCoroutine(DelayCheckForScore(0.2f));
+            StartCoroutine(DelayCheckForScore(0.05f));
+            
         }
     }
     
     private void OnCollisionEnter(Collision collision)
     {
-        if (_ballScoreData.scoreType == ScoreType.OutOfBounds) return;
+        if (_ballScoreData.scoreType == ScoreType.OutOfBounds || disableScoring) return;
         
         if(collision.gameObject.TryGetComponent(out IGoalPost goalPost))
         {
@@ -119,30 +126,27 @@ public class Ball : MonoBehaviour
             switch(goalPost.GoalPostType)
             {
                 case GoalPostType.Goal:
-                    disableScoring = true;
                     _ballScoreData.scoreType = ScoreType.Point;
-                    OnBallScoreComplete?.Invoke(_ballScoreData);
-                    SetWindActive(false);
-                    StopAllCoroutines();
-                    poolMember.ReturnToPool(1);
                     break;
                 case GoalPostType.Point:
-                    disableScoring = true;
                     _ballScoreData.scoreType = ScoreType.OutOfBounds;
-                    OnBallScoreComplete?.Invoke(_ballScoreData);
-                    SetWindActive(false);
-                    StopAllCoroutines();
-                    poolMember.ReturnToPool(1);
                     break;
                 case GoalPostType.None: default:
                     Debug.Log("Goal post is none!");
                     break;
             }
+            OnBallScoreComplete?.Invoke(_ballScoreData);
+            disableScoring = true;
+            Handheld.Vibrate();
+            SetWindActive(false);
+            StopAllCoroutines();
+            poolMember.ReturnToPool(1);
         }
     }
 
     public void DeactivateRigidbody()
     {
+        if(ballRigidbody.isKinematic == true) return;
         ballRigidbody.useGravity = false;
         ballRigidbody.linearVelocity = Vector3.zero;
         ballRigidbody.angularVelocity = Vector3.zero;
@@ -161,9 +165,10 @@ public class Ball : MonoBehaviour
         if(_ballScoreData.goalPostCollisionType == GoalPostType.None)
         {
             OnBallScoreComplete?.Invoke(_ballScoreData);
+            Handheld.Vibrate();
             disableScoring = true;
-            StopAllCoroutines();
             poolMember.ReturnToPool(1);
+            StopAllCoroutines();
         }
     }
 
@@ -176,7 +181,7 @@ public class Ball : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null; // Wait for the next frame
         }
-
+        Handheld.Vibrate();
         // Invoke the scoring event after the loop exits
         OnBallScoreComplete?.Invoke(_ballScoreData);
         disableScoring = true;

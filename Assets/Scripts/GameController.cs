@@ -16,7 +16,6 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         Ball.OnBallScoreComplete += OnBallScoreComplete;
-        StartGame();
     }
 
     private void OnDestroy()
@@ -24,10 +23,11 @@ public class GameController : MonoBehaviour
         Ball.OnBallScoreComplete -= OnBallScoreComplete;
     }
 
-    private void StartGame()
+    public void StartGame()
     {
         OnGameStart?.Invoke();
-        MovePlayer();
+        OnKickReady?.Invoke();
+        WindControl.Instance.RandomizeWindStrength();
     }
 
     public void OnBallScoreComplete(BallScoreData ballScoreData)
@@ -37,7 +37,7 @@ public class GameController : MonoBehaviour
             StartCoroutine(DelayMovePlayer(1f));
             return;
         }
-        OnGameOver?.Invoke();
+        StartCoroutine(DelayGameOver(1f));
     }
     
     public void RestartGame()
@@ -56,6 +56,12 @@ public class GameController : MonoBehaviour
         player.MoveToPosition(randomPositionInSector.GetRandomPositionInSector());
         WindControl.Instance.RandomizeWindStrength();
         OnKickReady?.Invoke();
+    }
+
+    private IEnumerator DelayGameOver(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        OnGameOver?.Invoke();
     }
 }
 

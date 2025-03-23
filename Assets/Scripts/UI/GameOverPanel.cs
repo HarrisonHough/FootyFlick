@@ -10,6 +10,11 @@ public class GameOverPanel : MonoBehaviour
     [SerializeField]
     private PlayerScore playerScore;
     
+    private void OnEnable()
+    {
+        UpdateText();
+    }
+    
     public void UpdateText()
     {
         if(playerScore == null)
