@@ -4,12 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField]
     private Transform goalTarget;
-    
-    private void Start()
-    {
 
-    }
-    
     public void MoveToPosition(Vector3 position)
     {
         // Update the player's position

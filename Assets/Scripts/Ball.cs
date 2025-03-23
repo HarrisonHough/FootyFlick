@@ -22,14 +22,31 @@ public class Ball : MonoBehaviour
     private BallScoreData _ballScoreData;
     
     public static Action<BallScoreData> OnBallScoreComplete;
-    
+    private PoolMember poolMember;
+
     private void Start()
+    {
+        GameController.OnGameOver += Reset;
+    }
+
+    private void OnDestroy()
+    {
+        GameController.OnGameOver -= Reset;
+    }
+
+    private void OnEnable()
     {
         if(ballRigidbody == null)
         {
             ballRigidbody = GetComponent<Rigidbody>();
         }
         DeactivateRigidbody();
+    }
+    private void Reset()
+    {
+        SetWindActive(false);
+        StopAllCoroutines();
+        poolMember.ReturnToPool(0);
     }
     
     public void SetWindActive(bool active)
@@ -39,6 +56,10 @@ public class Ball : MonoBehaviour
 
     public void LaunchBall(Vector3 velocity)
     {
+        if(poolMember == null)
+        {
+            poolMember = GetComponent<PoolMember>();
+        }
         _ballScoreData = new BallScoreData();
         ActivateRigidbody();
         ballRigidbody.linearVelocity = velocity;
@@ -65,7 +86,8 @@ public class Ball : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (_ballScoreData.scoreType != ScoreType.None || _ballScoreData.goalPostCollisionType != GoalPostType.None) return;
+        if (_ballScoreData.scoreType != ScoreType.None) return;
+        if (_ballScoreData.goalPostCollisionType != GoalPostType.None) return;
         if (other.gameObject.TryGetComponent(out IScoreArea score))
         {
             _ballScoreData.scoreType = score.ScoreType;
@@ -89,7 +111,8 @@ public class Ball : MonoBehaviour
     
     private void OnCollisionEnter(Collision collision)
     {
-        SetWindActive(false);
+        if (_ballScoreData.scoreType == ScoreType.OutOfBounds) return;
+        
         if(collision.gameObject.TryGetComponent(out IGoalPost goalPost))
         {
             _ballScoreData.goalPostCollisionType = goalPost.GoalPostType;
@@ -99,13 +122,17 @@ public class Ball : MonoBehaviour
                     disableScoring = true;
                     _ballScoreData.scoreType = ScoreType.Point;
                     OnBallScoreComplete?.Invoke(_ballScoreData);
+                    SetWindActive(false);
                     StopAllCoroutines();
+                    poolMember.ReturnToPool(1);
                     break;
                 case GoalPostType.Point:
                     disableScoring = true;
                     _ballScoreData.scoreType = ScoreType.OutOfBounds;
                     OnBallScoreComplete?.Invoke(_ballScoreData);
+                    SetWindActive(false);
                     StopAllCoroutines();
+                    poolMember.ReturnToPool(1);
                     break;
                 case GoalPostType.None: default:
                     Debug.Log("Goal post is none!");
@@ -131,9 +158,13 @@ public class Ball : MonoBehaviour
     IEnumerator DelayCheckForScore(float delay)
     {
         yield return new WaitForSeconds(delay);
-        OnBallScoreComplete?.Invoke(_ballScoreData);
-        disableScoring = true;
-        StopAllCoroutines();
+        if(_ballScoreData.goalPostCollisionType == GoalPostType.None)
+        {
+            OnBallScoreComplete?.Invoke(_ballScoreData);
+            disableScoring = true;
+            StopAllCoroutines();
+            poolMember.ReturnToPool(1);
+        }
     }
 
     private IEnumerator WaitForBallToStop()
@@ -149,5 +180,6 @@ public class Ball : MonoBehaviour
         // Invoke the scoring event after the loop exits
         OnBallScoreComplete?.Invoke(_ballScoreData);
         disableScoring = true;
+        poolMember.ReturnToPool(1);
     }
 }

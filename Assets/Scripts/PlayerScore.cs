@@ -1,47 +1,77 @@
 using System;
 using UnityEngine;
 
+public struct PlayerScoreData
+{
+    public int score;
+    public int kickCount;
+    public float accuracy;
+    public int goalCount;
+    public int pointCount;
+    public int outOfBoundsCount;
+}
+
 public class PlayerScore : MonoBehaviour
 {
-    [SerializeField]
-    private int score;
+    private PlayerScoreData playerScoreData;
     
-    public static Action<int> OnScoreUpdated;
-
+    public static Action<PlayerScoreData> OnScoreUpdated;
+    
     private void Start()
     {
+        playerScoreData = new PlayerScoreData();
         Ball.OnBallScoreComplete += OnScore;
+        BallLauncher.OnBallLaunched += OnKick;
+        GameController.OnGameStart += ResetScore;
+    }
+    
+    private void OnDestroy()
+    {
+        Ball.OnBallScoreComplete -= OnScore;
+        BallLauncher.OnBallLaunched -= OnKick;
+        GameController.OnGameStart -= ResetScore;
+    }
+    
+    private void OnKick()
+    {
+        playerScoreData.kickCount++;
     }
 
     private void OnScore(BallScoreData ballScoreData)
     {
-        if(ballScoreData.scoreType == ScoreType.Point)
+        switch (ballScoreData.scoreType)
         {
-            AddScore(1);
-        }
-        else if (ballScoreData.scoreType == ScoreType.Goal)
-        {
-            AddScore(6);
+            case ScoreType.Goal:
+                playerScoreData.goalCount++;
+                AddToScore(6);
+                break;
+            case ScoreType.Point:
+                playerScoreData.pointCount++;
+                AddToScore(1);
+                break;
+            case ScoreType.OutOfBounds:
+                playerScoreData.outOfBoundsCount++;
+                break;
+            case ScoreType.None:
+                break;
         }
     }
 
-    public int Score
+    public PlayerScoreData GetScoreData
     {
-        get => score;
-        set => score = value;
+        get => playerScoreData;
+        set => playerScoreData = value;
     }
 
-    public void AddScore(int score)
+    public void AddToScore(int score)
     {
-        Score += score;
-        OnScoreUpdated.Invoke(Score);
+        playerScoreData.score += score;
+        OnScoreUpdated.Invoke(GetScoreData);
     }
 
     public void ResetScore()
     {
-        Score = 0;
-        OnScoreUpdated.Invoke(Score);
+        GetScoreData = new PlayerScoreData();
+        OnScoreUpdated.Invoke(GetScoreData);
     }
-    
-    
 }

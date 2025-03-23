@@ -14,11 +14,29 @@ public class GameCanvas : MonoBehaviour
     {
         Ball.OnBallScoreComplete += OnScore;
         PlayerScore.OnScoreUpdated += OnScoreUpdated;
+        GameController.OnGameOver += OnGameOver;
+        GameController.OnGameStart += OnGameStart;
     }
 
-    private void OnScoreUpdated(int score)
+    public void OnDestroy()
     {
-        scoreText.text = score.ToString();
+        Ball.OnBallScoreComplete -= OnScore;
+        PlayerScore.OnScoreUpdated -= OnScoreUpdated;
+        GameController.OnGameOver -= OnGameOver;
+    }
+    private void OnGameOver()
+    {
+        gameObject.SetActive(false);
+    }
+    
+    private void OnGameStart()
+    {
+        ResetUI();
+    }
+
+    private void OnScoreUpdated(PlayerScoreData playerScoreData)
+    {
+        scoreText.text = playerScoreData.score.ToString();
     }
 
     public void OnScore(BallScoreData ballScoreData)
@@ -60,10 +78,11 @@ public class GameCanvas : MonoBehaviour
         StopAllCoroutines();
         StartCoroutine(DelayClearNotificationText(2f));
     }
-
-    public void OnDestroy()
+    
+    private void ResetUI()
     {
-        Ball.OnBallScoreComplete -= OnScore;
+        notificationText.text = "";
+        scoreText.text = "0";
     }
     
     IEnumerator DelayClearNotificationText(float delay)

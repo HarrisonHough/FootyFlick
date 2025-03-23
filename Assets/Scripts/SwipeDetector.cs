@@ -6,11 +6,9 @@ using UnityEngine.InputSystem;
 [Serializable]
 public struct SwipeData
 {
-    public Vector2 StartPosition;
-    public Vector2 EndPosition;
-    public Vector2 Direction;
     public Vector2 SwipeVector;
     public float Distance;
+    public float Speed;    // Speed of the swipe
 }
 
 public class SwipeDetector : MonoBehaviour
@@ -20,16 +18,25 @@ public class SwipeDetector : MonoBehaviour
     private GameInputActions inputActions;
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
+    private float startTime;
+    private float endTime;
     private bool isSwiping = false;
-    public UnityEvent<SwipeData> OnSwipEvent;
+    public UnityEvent<SwipeData> OnSwipeEvent;
     private bool disableSwipeDetection = false;
 
     private void Awake()
     {
         inputActions = new GameInputActions();
 
-        inputActions.PlayerControls.TouchPress.started += ctx => StartTouch(ctx);
-        inputActions.PlayerControls.TouchPress.canceled += ctx => EndTouch(ctx);
+        inputActions.PlayerControls.TouchPress.started += StartTouch;
+        inputActions.PlayerControls.TouchPress.canceled += EndTouch;
+    }
+
+    private void OnDestroy()
+    {
+        if(inputActions == null) return;
+        inputActions.PlayerControls.TouchPress.started -= StartTouch;
+        inputActions.PlayerControls.TouchPress.canceled -= EndTouch;
     }
 
     private void OnEnable()
@@ -41,7 +48,7 @@ public class SwipeDetector : MonoBehaviour
     {
         inputActions.Disable();
     }
-    
+
     public void SetSwipeDisable(bool value)
     {
         disableSwipeDetection = value;
@@ -50,6 +57,7 @@ public class SwipeDetector : MonoBehaviour
     private void StartTouch(InputAction.CallbackContext context)
     {
         startTouchPosition = inputActions.PlayerControls.TouchPosition.ReadValue<Vector2>();
+        startTime = (float)context.startTime; // Record the start time
         isSwiping = true;
     }
 
@@ -57,6 +65,7 @@ public class SwipeDetector : MonoBehaviour
     {
         if (disableSwipeDetection) return;
         endTouchPosition = inputActions.PlayerControls.TouchPosition.ReadValue<Vector2>();
+        endTime = (float)context.time; // Record the end time
         isSwiping = false;
         DetectSwipe();
     }
@@ -65,18 +74,19 @@ public class SwipeDetector : MonoBehaviour
     {
         var delta = endTouchPosition - startTouchPosition;
         var swipeDistance = delta.magnitude / Screen.height;
+        var swipeDuration = endTime - startTime; 
+        var swipeSpeed = swipeDistance / swipeDuration; 
+
         var swipeData = new SwipeData
         {
-            StartPosition = startTouchPosition,
-            EndPosition = endTouchPosition,
             SwipeVector = delta,
-            Direction = delta.normalized,
-            Distance = swipeDistance
+            Distance = swipeDistance,
+            Speed = swipeSpeed
         };
 
         if (swipeData.Distance >= minSwipeDistance)
         {
-            OnSwipEvent.Invoke(swipeData);
+            OnSwipeEvent.Invoke(swipeData);
         }
     }
 }

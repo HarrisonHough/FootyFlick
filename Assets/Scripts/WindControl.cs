@@ -5,13 +5,14 @@ public class WindControl : MonoBehaviour
 {
     public static WindControl Instance;
     [SerializeField] private Transform cameraTransform;
-    [SerializeField] private float windStrengthRange = 6f; 
-    [SerializeField] private float windChangeInterval = 5f;
-    private WindData windData;
+    [SerializeField] private float windStrengthRange = 4f; 
+
     
+    public float WindStrengthRange => windStrengthRange;
     public static Action<WindData> OnWindChanged;
     public float WindForce => windData.Force;
     public Vector3 WindDirection => windData.Direction;
+    private WindData windData;
     
     private void Start()
     {
