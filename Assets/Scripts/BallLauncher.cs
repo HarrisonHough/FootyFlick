@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
+[Serializable]
 public enum KickStyle
 {
     DropPunt,
@@ -26,6 +28,7 @@ public class BallLauncher : MonoBehaviour
     public static Action OnBallLaunched;
     private Quaternion targetRotation;
     private KickStyle currentKickStyle;
+    public UnityEvent OnBallTap;
 
     private static readonly Dictionary<KickStyle, Vector3> kickStyleRotations = new Dictionary<KickStyle, Vector3>
     {
@@ -80,6 +83,10 @@ public class BallLauncher : MonoBehaviour
     {
         Debug.Log("Ball was tapped!");
         
+        OnBallTap?.Invoke();
+
+        return;
+        
         KickStyle[] styles = (KickStyle[])Enum.GetValues(typeof(KickStyle));
 
         // Find the index of the current style
@@ -92,6 +99,17 @@ public class BallLauncher : MonoBehaviour
         currentKickStyle = styles[nextIndex];
         StopAllCoroutines();
         StartCoroutine(RotateOverTime(kickStyleRotations[currentKickStyle], 0.2f));
+    }
+    
+    public void SetKickStyle(KickStyle kickStyle)
+    {
+        if(currentKickStyle == kickStyle)
+        {
+            return;
+        }
+        currentKickStyle = kickStyle;
+        StopAllCoroutines();
+        StartCoroutine(RotateOverTime(kickStyleRotations[kickStyle], 0.2f));
     }
 
     public void OnSwipeDetected(SwipeData swipeData)
@@ -160,6 +178,7 @@ public class BallLauncher : MonoBehaviour
         GameObject ballObject = ballPool.GetObject(ballParent.position, ballParent.rotation);
         ballObject.transform.parent = ballParent;
         currentBall = ballObject.GetComponent<Ball>();
+        currentKickStyle = KickStyle.DropPunt;
     }
 
     public IEnumerator RotateOverTime(Vector3 targetLocalRotation, float duration)
