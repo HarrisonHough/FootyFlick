@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class BallLauncher : MonoBehaviour
@@ -9,9 +10,15 @@ public class BallLauncher : MonoBehaviour
     [SerializeField] private float maxLaunchForce = 10f;
     [SerializeField] private float maxSwipeDistance = 0.5f; // Proportion of screen height
     [SerializeField] private Pool ballPool;
-
+    [SerializeField] private float minVerticalSwipe = 0.1f; // Minimum vertical swipe distance to be considered a valid swipe
+    [SerializeField] private float minHorizontalSwipe = 0.05f; // Minimum horizontal swipe distance to be considered a valid swipe
+    [SerializeField] private Transform leftSnapTransform;
+    [SerializeField] private Transform rightSnapTransform;
+    
     private Ball currentBall;
     public static Action OnBallLaunched;
+    private Quaternion targetRotation;
+    
     private void Start()
     {
         GameController.OnKickReady += OnKickReady;
@@ -30,14 +37,34 @@ public class BallLauncher : MonoBehaviour
     public void OnSwipeDetected(SwipeData swipeData)
     {
         if (currentBall == null) return;
-        Vector3 launchVelocity = CalculateLaunchVelocity(swipeData);
-        LaunchBall(launchVelocity);
+
+        if (swipeData.SwipeVector.y/Screen.height > minHorizontalSwipe)
+        {
+            LaunchBall(swipeData);
+            return;
+        }
+
+        if(Math.Abs(swipeData.SwipeVector.x) > minHorizontalSwipe)
+        {
+            // coroutine to rotate ball to snap angle 
+            if (swipeData.SwipeVector.x > 0)
+            {
+                StopAllCoroutines();
+                StartCoroutine( RotateOverTime(rightSnapTransform.rotation, 0.2f));
+            }
+            else
+            {
+                StopAllCoroutines();
+                StartCoroutine( RotateOverTime(leftSnapTransform.rotation, 0.2f));
+            }
+            
+        }
     }
 
     private Vector3 CalculateLaunchVelocity(SwipeData swipeData)
     {
         // Ignore swipes with a downward or neutral vertical component
-        if (swipeData.SwipeVector.y <= 0)
+        if (swipeData.SwipeVector.y <= minHorizontalSwipe)
         {
             return Vector3.zero;
         }
@@ -69,11 +96,16 @@ public class BallLauncher : MonoBehaviour
         return velocity;
     }
 
-    private void LaunchBall(Vector3 velocity)
+    private void LaunchBall(SwipeData swipeData)
     {
+        var launchVelocity = CalculateLaunchVelocity(swipeData);
         if (currentBall == null) SpawnBall();
+        if( launchVelocity.magnitude < 0.05f)
+        {
+            return;
+        }
         currentBall.transform.parent = null;
-        currentBall.LaunchBall(velocity);
+        currentBall.LaunchBall(launchVelocity);
         currentBall = null;
         OnBallLaunched?.Invoke();
     }
@@ -84,4 +116,19 @@ public class BallLauncher : MonoBehaviour
         ballObject.transform.parent = ballParent;
         currentBall = ballObject.GetComponent<Ball>();
     }
+
+    public IEnumerator RotateOverTime(Quaternion targetRotation, float duration)
+    {
+        Quaternion initialRotation = currentBall.transform.rotation;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            currentBall.transform.rotation = Quaternion.Slerp(initialRotation, targetRotation, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        currentBall.transform.rotation = targetRotation;
+    }
+    
 }

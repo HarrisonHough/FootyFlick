@@ -14,7 +14,7 @@ public struct SwipeData
 public class SwipeDetector : MonoBehaviour
 {
     [SerializeField]
-    private float minSwipeDistance = 0.1f;
+    private float minSwipeDistance = 0.05f;
     private GameInputActions inputActions;
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
@@ -86,6 +86,7 @@ public class SwipeDetector : MonoBehaviour
 
         if (swipeData.Distance >= minSwipeDistance)
         {
+            Debug.Log( $"Swipe detected: {swipeData.SwipeVector}, Distance: {swipeData.Distance}, Speed: {swipeData.Speed}");
             OnSwipeEvent.Invoke(swipeData);
         }
     }
