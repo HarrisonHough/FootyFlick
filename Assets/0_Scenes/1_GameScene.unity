@@ -5034,12 +5034,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minSwipeDistance: 0.1
+  tapThreshold: 0.2
+  tapMovementThreshold: 0.01
   OnSwipeEvent:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1097539133}
         m_TargetAssemblyTypeName: BallLauncher, Assembly-CSharp
         m_MethodName: OnSwipeDetected
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnTapEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1097539133}
+        m_TargetAssemblyTypeName: BallLauncher, Assembly-CSharp
+        m_MethodName: OnTap
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5062,15 +5079,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ballParent: {fileID: 1731485557}
-  cameraTransform: {fileID: 330585546}
+  camera: {fileID: 330585545}
   launchAngle: 45
   maxLaunchForce: 16
   maxSwipeDistance: 0.7
   ballPool: {fileID: 1110936333}
   minVerticalSwipe: 0.2
-  minHorizontalSwipe: 0.05
-  leftSnapTransform: {fileID: 1427129667}
-  rightSnapTransform: {fileID: 708235419}
+  ballSpawnPoint: {fileID: 0}
 --- !u!114 &1097539134
 MonoBehaviour:
   m_ObjectHideFlags: 0

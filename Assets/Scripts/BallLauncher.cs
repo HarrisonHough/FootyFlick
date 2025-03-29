@@ -1,24 +1,39 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+
+public enum KickStyle
+{
+    DropPunt,
+    SnapLeft,
+    SnapRight
+}
 
 public class BallLauncher : MonoBehaviour
 {
     [SerializeField] private Transform ballParent;
-    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private Camera camera;
     [SerializeField] private float launchAngle = 45f;
     [SerializeField] private float maxLaunchForce = 10f;
     [SerializeField] private float maxSwipeDistance = 0.5f; // Proportion of screen height
     [SerializeField] private Pool ballPool;
     [SerializeField] private float minVerticalSwipe = 0.1f; // Minimum vertical swipe distance to be considered a valid swipe
-    [SerializeField] private float minHorizontalSwipe = 0.05f; // Minimum horizontal swipe distance to be considered a valid swipe
-    [SerializeField] private Transform leftSnapTransform;
-    [SerializeField] private Transform rightSnapTransform;
     
     private Ball currentBall;
     public static Action OnBallLaunched;
     private Quaternion targetRotation;
-    
+    private KickStyle currentKickStyle;
+
+    private static readonly Dictionary<KickStyle, Vector3> kickStyleRotations = new Dictionary<KickStyle, Vector3>
+    {
+        { KickStyle.DropPunt, new Vector3(64, 0, 0) },
+        { KickStyle.SnapLeft, new Vector3(33, 130, 0) },
+        { KickStyle.SnapRight, new Vector3(33, -130, 0) }
+    };
+
     private void Start()
     {
         GameController.OnKickReady += OnKickReady;
@@ -33,38 +48,68 @@ public class BallLauncher : MonoBehaviour
     {
         if (currentBall == null) SpawnBall();
     }
+    
+    public void OnTap(Vector2 screenPosition)
+    {
+        if (IsPointerOverUIObject())
+            return; 
+
+        Ray ray = camera.ScreenPointToRay(screenPosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            if (hit.collider.CompareTag("Ball"))
+            {
+                // Ball was tapped or clicked
+                OnBallTapped();
+            }
+        }
+    }
+    
+    private bool IsPointerOverUIObject()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current)
+        {
+            position = Pointer.current.position.ReadValue()
+        };
+        var results = new System.Collections.Generic.List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
+    }
+    
+    private void OnBallTapped()
+    {
+        Debug.Log("Ball was tapped!");
+        
+        KickStyle[] styles = (KickStyle[])Enum.GetValues(typeof(KickStyle));
+
+        // Find the index of the current style
+        int currentIndex = Array.IndexOf(styles, currentKickStyle);
+
+        // Calculate the next index, wrapping around if necessary
+        int nextIndex = (currentIndex + 1) % styles.Length;
+
+        // Update the current kick style
+        currentKickStyle = styles[nextIndex];
+        StopAllCoroutines();
+        StartCoroutine(RotateOverTime(kickStyleRotations[currentKickStyle], 0.2f));
+    }
 
     public void OnSwipeDetected(SwipeData swipeData)
     {
         if (currentBall == null) return;
 
-        if (swipeData.SwipeVector.y/Screen.height > minHorizontalSwipe)
+        if (swipeData.Distance > minVerticalSwipe)
         {
             LaunchBall(swipeData);
             return;
         }
-
-        if(Math.Abs(swipeData.SwipeVector.x) > minHorizontalSwipe)
-        {
-            // coroutine to rotate ball to snap angle 
-            if (swipeData.SwipeVector.x > 0)
-            {
-                StopAllCoroutines();
-                StartCoroutine( RotateOverTime(rightSnapTransform.rotation, 0.2f));
-            }
-            else
-            {
-                StopAllCoroutines();
-                StartCoroutine( RotateOverTime(leftSnapTransform.rotation, 0.2f));
-            }
-            
-        }
+        
     }
 
     private Vector3 CalculateLaunchVelocity(SwipeData swipeData)
     {
         // Ignore swipes with a downward or neutral vertical component
-        if (swipeData.SwipeVector.y <= minHorizontalSwipe)
+        if (swipeData.SwipeVector.y <= 0)
         {
             return Vector3.zero;
         }
@@ -78,12 +123,12 @@ public class BallLauncher : MonoBehaviour
         var launchForce = (distanceFactor + speedFactor) * 0.5f * maxLaunchForce;
 
         // Get the camera's forward direction, ignoring the y component
-        var cameraForward = cameraTransform.forward;
+        var cameraForward = camera.gameObject.transform.forward;
         cameraForward.y = 0;
         cameraForward.Normalize();
 
         // Get the camera's right direction
-        var cameraRight = cameraTransform.right;
+        var cameraRight = camera.gameObject.transform.right;
 
         // Calculate the launch direction relative to the camera's orientation
         var launchDirection = (cameraRight * swipeData.SwipeVector.x + cameraForward * swipeData.SwipeVector.y).normalized;
@@ -117,18 +162,29 @@ public class BallLauncher : MonoBehaviour
         currentBall = ballObject.GetComponent<Ball>();
     }
 
-    public IEnumerator RotateOverTime(Quaternion targetRotation, float duration)
+    public IEnumerator RotateOverTime(Vector3 targetLocalRotation, float duration)
     {
-        Quaternion initialRotation = currentBall.transform.rotation;
-        float elapsedTime = 0f;
+        // Convert target local Euler angles to a quaternion
+        var localRotation = Quaternion.Euler(targetLocalRotation);
 
+        // Calculate the target world rotation relative to the parent's rotation
+        var targetWorldRotation = transform.rotation * localRotation;
+
+        // Store the initial rotation of the currentBall
+        var initialRotation = currentBall.transform.rotation;
+
+        var elapsedTime = 0f;
+
+        // Perform the rotation over the specified duration
         while (elapsedTime < duration)
         {
-            currentBall.transform.rotation = Quaternion.Slerp(initialRotation, targetRotation, elapsedTime / duration);
+            currentBall.transform.rotation = Quaternion.Slerp(initialRotation, targetWorldRotation, elapsedTime / duration);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        currentBall.transform.rotation = targetRotation;
+
+        // Ensure the final rotation is set precisely
+        currentBall.transform.rotation = targetWorldRotation;
     }
     
 }
