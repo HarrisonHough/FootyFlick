@@ -163,12 +163,12 @@ public class BallLauncher : MonoBehaviour
     {
         var launchVelocity = CalculateLaunchVelocity(swipeData);
         if (currentBall == null) SpawnBall();
-        if( launchVelocity.magnitude < 0.05f)
+        if (launchVelocity.magnitude < 0.05f)
         {
             return;
         }
         currentBall.transform.parent = null;
-        currentBall.LaunchBall(launchVelocity);
+        currentBall.LaunchBall(launchVelocity, currentKickStyle, camera.transform);
         currentBall = null;
         OnBallLaunched?.Invoke();
     }

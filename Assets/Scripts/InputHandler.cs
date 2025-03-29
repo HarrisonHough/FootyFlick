@@ -94,13 +94,10 @@ public class InputHandler : MonoBehaviour
                 Speed = swipeSpeed
             };
 
-            Debug.Log($"Swipe detected: {swipeData.SwipeVector}, Distance: {swipeData.Distance}, Speed: {swipeData.Speed}");
             OnSwipeEvent.Invoke(swipeData);
         }
         else if (swipeDuration <= tapThreshold && swipeDistance <= tapMovementThreshold)
         {
-            // Tap detected
-            Debug.Log("Tap detected at position: " + startTouchPosition);
             OnTapEvent.Invoke(startTouchPosition);
         }
     }

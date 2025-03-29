@@ -204,9 +204,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ballRigidbody: {fileID: 796270407238782352}
   windStrength: 5
-  spinSpeed: -10
+  spinSpeed: -20
   minBallSpeed: 0.2
   maxBallLifeTime: 3
+  magnusCoefficient: 0.1
+  curvingForceMagnitude: 5
 --- !u!96 &864120538955586021
 TrailRenderer:
   serializedVersion: 3

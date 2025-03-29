@@ -14,19 +14,26 @@ public class Ball : MonoBehaviour
     private float minBallSpeed = 0.2f;
     [SerializeField]
     private float maxBallLifeTime = 3f;
+    [SerializeField]
+    private float magnusCoefficient = 0.1f; // Adjust this value to fine-tune the Magnus effect
+    [SerializeField]
+    private float curvingForceMagnitude = 5f;
+    private Vector3 curvingForceDirection = Vector3.zero;
     private Vector3 windDirection = new Vector3(1,0,0);
     private bool windActive;
     
     private bool disableScoring;
     
     private BallScoreData _ballScoreData;
-    
+    private KickStyle currentKickStyle;
     public static Action<BallScoreData> OnBallScoreComplete;
     private PoolMember poolMember;
+    private MeshRenderer ballRenderer;
 
     private void Start()
     {
         GameController.OnGameOver += Reset;
+        ballRenderer = GetComponent<MeshRenderer>();
     }
 
     private void OnDestroy()
@@ -60,9 +67,9 @@ public class Ball : MonoBehaviour
         windActive = active;
     }
 
-    public void LaunchBall(Vector3 velocity)
+    public void LaunchBall(Vector3 velocity, KickStyle kickStyle, Transform cameraTransform)
     {
-        if(poolMember == null)
+        if (poolMember == null)
         {
             poolMember = GetComponent<PoolMember>();
         }
@@ -70,7 +77,29 @@ public class Ball : MonoBehaviour
         _ballScoreData = new BallScoreData();
         ActivateRigidbody();
         ballRigidbody.linearVelocity = velocity;
-        ballRigidbody.angularVelocity = transform.right * spinSpeed; // Backward spin
+        
+        Vector3 cameraRight = cameraTransform.right;
+        cameraRight.y = 0;
+        cameraRight.Normalize();
+        
+        currentKickStyle = kickStyle;
+        // Set angular velocity based on kick style
+        switch (currentKickStyle)
+        {
+            default:
+                curvingForceDirection = Vector3.zero;
+                ballRigidbody.angularVelocity = transform.right * spinSpeed; // Backward spin
+                break;
+            case KickStyle.SnapLeft:
+                curvingForceDirection = -cameraRight;
+                ballRigidbody.angularVelocity = transform.right * spinSpeed * 2; // Spin around the up axis
+                break;
+            case KickStyle.SnapRight:
+                curvingForceDirection = cameraRight;
+                ballRigidbody.angularVelocity = transform.right * spinSpeed * 2; // Spin around the up axis in the opposite direction
+                break;
+        }
+
         SetWindActive(true);
         windStrength = WindControl.Instance.WindForce;
         windDirection = WindControl.Instance.WindDirection;
@@ -79,10 +108,31 @@ public class Ball : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(windActive)
+        if (windActive)
         {
             ApplyWindForce();
         }
+
+        if (currentKickStyle != KickStyle.DropPunt)
+        {
+            ApplyCurvingForce();
+        }
+
+        if (ballRenderer == null)
+        {
+            ballRenderer = GetComponent<MeshRenderer>();
+        }
+
+        if (!ballRenderer.isVisible && !disableScoring )
+        {
+            BallScored();
+        }
+    }
+
+    private void ApplyCurvingForce()
+    {
+        var forceDirection = Quaternion.LookRotation(ballRigidbody.linearVelocity) * curvingForceDirection;
+        ballRigidbody.AddForce(forceDirection.normalized * curvingForceMagnitude, ForceMode.Force);
     }
 
     private void ApplyWindForce()
@@ -135,12 +185,8 @@ public class Ball : MonoBehaviour
                     Debug.Log("Goal post is none!");
                     break;
             }
-            OnBallScoreComplete?.Invoke(_ballScoreData);
-            disableScoring = true;
-            Handheld.Vibrate();
-            SetWindActive(false);
-            StopAllCoroutines();
-            poolMember.ReturnToPool(1);
+
+            BallScored();
         }
     }
 
@@ -164,11 +210,7 @@ public class Ball : MonoBehaviour
         yield return new WaitForSeconds(delay);
         if(_ballScoreData.goalPostCollisionType == GoalPostType.None)
         {
-            OnBallScoreComplete?.Invoke(_ballScoreData);
-            Handheld.Vibrate();
-            disableScoring = true;
-            poolMember.ReturnToPool(1);
-            StopAllCoroutines();
+            BallScored();
         }
     }
 
@@ -181,10 +223,17 @@ public class Ball : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null; // Wait for the next frame
         }
-        Handheld.Vibrate();
+        // Invoke the scoring event after the loop exits
+        BallScored();
+    }
+
+    private void BallScored()
+    {
         // Invoke the scoring event after the loop exits
         OnBallScoreComplete?.Invoke(_ballScoreData);
         disableScoring = true;
         poolMember.ReturnToPool(1);
+        StopAllCoroutines();
+        SetWindActive(false);
     }
 }
