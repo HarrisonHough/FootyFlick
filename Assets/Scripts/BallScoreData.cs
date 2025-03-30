@@ -1,8 +1,9 @@
 using System;
+using UnityEngine.Serialization;
 
 [Serializable]
 public struct BallScoreData
 {
-    public ScoreType scoreType;
+    [FormerlySerializedAs("scoreType")] public KickResult kickResult;
     public GoalPostType goalPostCollisionType;
 }

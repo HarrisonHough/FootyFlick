@@ -32,13 +32,13 @@ public class Ball : MonoBehaviour
 
     private void Start()
     {
-        GameController.OnGameOver += Reset;
+        GameManager.OnGameOver += Reset;
         ballRenderer = GetComponent<MeshRenderer>();
     }
 
     private void OnDestroy()
     {
-        GameController.OnGameOver -= Reset;
+        GameManager.OnGameOver -= Reset;
     }
 
     private void OnEnable()
@@ -143,20 +143,20 @@ public class Ball : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (disableScoring || _ballScoreData.scoreType != ScoreType.None || _ballScoreData.goalPostCollisionType != GoalPostType.None) return;
+        if (disableScoring || _ballScoreData.kickResult != KickResult.None || _ballScoreData.goalPostCollisionType != GoalPostType.None) return;
         
         if (other.gameObject.TryGetComponent(out IScoreArea score))
         {
-            _ballScoreData.scoreType = score.ScoreType;
-            switch (score.ScoreType)
+            _ballScoreData.kickResult = score.KickResult;
+            switch (score.KickResult)
             {
-                case ScoreType.OutOfBounds:
+                case KickResult.OutOfBounds:
                     Debug.Log("Out of bounds!");
                     break;
-                case ScoreType.Goal:
+                case KickResult.Goal:
                     Debug.Log("Goal scored!");
                     break;
-                case ScoreType.Point:
+                case KickResult.Point:
                     Debug.Log("Point scored!");
                     break;
             }
@@ -168,7 +168,7 @@ public class Ball : MonoBehaviour
     
     private void OnCollisionEnter(Collision collision)
     {
-        if (_ballScoreData.scoreType == ScoreType.OutOfBounds || disableScoring) return;
+        if (_ballScoreData.kickResult == KickResult.OutOfBounds || disableScoring) return;
         
         if(collision.gameObject.TryGetComponent(out IGoalPost goalPost))
         {
@@ -176,10 +176,10 @@ public class Ball : MonoBehaviour
             switch(goalPost.GoalPostType)
             {
                 case GoalPostType.Goal:
-                    _ballScoreData.scoreType = ScoreType.Point;
+                    _ballScoreData.kickResult = KickResult.Point;
                     break;
                 case GoalPostType.Point:
-                    _ballScoreData.scoreType = ScoreType.OutOfBounds;
+                    _ballScoreData.kickResult = KickResult.OutOfBounds;
                     break;
                 case GoalPostType.None: default:
                     Debug.Log("Goal post is none!");

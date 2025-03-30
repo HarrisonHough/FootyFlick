@@ -19,6 +19,7 @@ public class InputHandler : MonoBehaviour
     private float tapThreshold = 0.2f; // Maximum duration for a tap to be registered (in seconds)
     [SerializeField]
     private float tapMovementThreshold = 0.01f; // Maximum movement allowed for a tap to be registered
+    [SerializeField] private float holdThreshold = 0.35f; // Seconds to trigger hold
 
     private GameInputActions inputActions;
     private Vector2 startTouchPosition;
@@ -27,10 +28,14 @@ public class InputHandler : MonoBehaviour
     private float endTime;
     private bool isSwiping = false;
     private bool disableSwipeDetection = false;
+    private bool isHolding = false;
+    private bool holdTriggered = false;
 
     public UnityEvent<SwipeData> OnSwipeEvent;
+    public UnityEvent<Vector2> OnReverseSwipeEvent; 
     public UnityEvent<Vector2> OnTapEvent;
-
+    public UnityEvent<Vector2> OnHoldStartEvent;
+    
     private void Awake()
     {
         inputActions = new GameInputActions();
@@ -55,6 +60,32 @@ public class InputHandler : MonoBehaviour
     {
         inputActions.Disable();
     }
+    
+    private void Update()
+    {
+        if (isHolding && !holdTriggered)
+        {
+            float heldTime = Time.time - startTime;
+            Vector2 currentTouch = inputActions.PlayerControls.TouchPosition.ReadValue<Vector2>();
+            float moveDistance = Vector2.Distance(currentTouch, startTouchPosition) / Screen.height;
+
+            // If movement is small and time exceeds threshold, it's a hold
+            if (heldTime >= holdThreshold && moveDistance <= tapMovementThreshold)
+            {
+                holdTriggered = true;
+                isSwiping = false;
+                isHolding = false;
+
+                OnHoldStartEvent.Invoke(startTouchPosition);
+            }
+
+            // Cancel hold if swipe starts
+            if (moveDistance > tapMovementThreshold)
+            {
+                isHolding = false;
+            }
+        }
+    }
 
     public void SetSwipeDisable(bool value)
     {
@@ -64,37 +95,52 @@ public class InputHandler : MonoBehaviour
     private void StartTouch(InputAction.CallbackContext context)
     {
         startTouchPosition = inputActions.PlayerControls.TouchPosition.ReadValue<Vector2>();
-        startTime = (float)context.startTime; // Record the start time
+        startTime = (float)context.startTime;
         isSwiping = true;
+        isHolding = true;
+        holdTriggered = false;
     }
 
     private void EndTouch(InputAction.CallbackContext context)
     {
         if (disableSwipeDetection) return;
         endTouchPosition = inputActions.PlayerControls.TouchPosition.ReadValue<Vector2>();
-        endTime = (float)context.time; // Record the end time
+        endTime = (float)context.time;
         isSwiping = false;
-        DetectGesture();
+        isHolding = false;
+
+        // Skip gesture detection if hold already triggered
+        if (!holdTriggered)
+        {
+            DetectGesture();
+        }
     }
 
     private void DetectGesture()
     {
-        var delta = endTouchPosition - startTouchPosition;
-        var swipeDistance = delta.magnitude / Screen.height;
-        var swipeDuration = endTime - startTime;
-        var swipeSpeed = swipeDistance / swipeDuration;
+        Vector2 delta = endTouchPosition - startTouchPosition;
+        float swipeDistance = delta.magnitude / Screen.height;
+        float swipeDuration = endTime - startTime;
+        float swipeSpeed = swipeDistance / swipeDuration;
 
         if (swipeDistance >= minSwipeDistance)
         {
-            // Swipe detected
-            var swipeData = new SwipeData
+            var angle = Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
+            angle = (angle + 360f) % 360f;
+            
+            if (angle is >= 45f and <= 135f)
             {
-                SwipeVector = delta,
-                Distance = swipeDistance,
-                Speed = swipeSpeed
-            };
-
-            OnSwipeEvent.Invoke(swipeData);
+                OnSwipeEvent.Invoke(new SwipeData
+                {
+                    SwipeVector = delta,
+                    Distance = swipeDistance,
+                    Speed = swipeSpeed
+                });
+            }
+            else
+            {
+                OnReverseSwipeEvent.Invoke(delta);
+            }
         }
         else if (swipeDuration <= tapThreshold && swipeDistance <= tapMovementThreshold)
         {

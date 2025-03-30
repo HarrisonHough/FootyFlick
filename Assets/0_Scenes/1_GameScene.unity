@@ -380,6 +380,7 @@ GameObject:
   - component: {fileID: 38560951}
   - component: {fileID: 38560950}
   - component: {fileID: 38560949}
+  - component: {fileID: 38560952}
   m_Layer: 5
   m_Name: CancelButton
   m_TagString: Untagged
@@ -500,6 +501,47 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 38560947}
   m_CullTransparentMesh: 1
+--- !u!114 &38560952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 38560947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2018276707}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 244804220}
+          m_TargetAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
+          m_MethodName: OnSubmit
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1001 &41489690
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1772,6 +1814,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &244804220 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8403900820769223541, guid: 404cac14d616459429521266874dc743, type: 3}
+  m_PrefabInstance: {fileID: 244804216}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 244804218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &257950379
 GameObject:
   m_ObjectHideFlags: 0
@@ -4212,7 +4265,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &595257793
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4501,7 +4554,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &633547012
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7509,7 +7562,7 @@ Transform:
   m_GameObject: {fileID: 1097539129}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -17.71}
+  m_LocalPosition: {x: 0, y: 0, z: -10.66}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7546,6 +7599,7 @@ MonoBehaviour:
   minSwipeDistance: 0.1
   tapThreshold: 0.2
   tapMovementThreshold: 0.01
+  holdThreshold: 0.35
   OnSwipeEvent:
     m_PersistentCalls:
       m_Calls:
@@ -7561,6 +7615,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnReverseSwipeEvent:
+    m_PersistentCalls:
+      m_Calls: []
   OnTapEvent:
     m_PersistentCalls:
       m_Calls:
@@ -7576,6 +7633,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnHoldStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1097539133
 MonoBehaviour:
   m_ObjectHideFlags: 0

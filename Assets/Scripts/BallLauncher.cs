@@ -39,12 +39,12 @@ public class BallLauncher : MonoBehaviour
 
     private void Start()
     {
-        GameController.OnKickReady += OnKickReady;
+        GameManager.OnKickReady += OnKickReady;
     }
 
     private void OnDestroy()
     {
-        GameController.OnKickReady -= OnKickReady;
+        GameManager.OnKickReady -= OnKickReady;
     }
 
     private void OnKickReady()
@@ -121,8 +121,30 @@ public class BallLauncher : MonoBehaviour
             LaunchBall(swipeData);
             return;
         }
-        
     }
+
+    public void HandleReverseSwipe(Vector2 delta)
+    {
+        float angle = Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
+        angle = (angle + 360f) % 360f;
+
+        Debug.Log($"Reverse swipe angle: {angle}");
+
+        if (angle >= 135f && angle < 250f)
+        {
+            SetKickStyle(KickStyle.SnapLeft); // Down-left
+        }
+        else if (angle >= 250f && angle < 290f)
+        {
+            SetKickStyle(KickStyle.DropPunt); // Straight down (40° range)
+        }
+        else if (angle >= 290f || angle < 45f)
+        {
+            SetKickStyle(KickStyle.SnapRight); // Down-right
+        }
+    }
+
+
 
     private Vector3 CalculateLaunchVelocity(SwipeData swipeData)
     {

@@ -12,8 +12,8 @@ public class MenuCanvas : MonoBehaviour
 
     private void Start()
     {
-        GameController.OnGameOver += OnGameOver;
-        GameController.OnGameStart += OnGameStart;
+        GameManager.OnGameOver += OnGameOver;
+        GameManager.OnGameStart += OnGameStart;
         gameOverPanel.gameObject.SetActive(false);
         optionsPanel.SetActive(false);
         homePanel.SetActive(true);
@@ -21,8 +21,8 @@ public class MenuCanvas : MonoBehaviour
     
     private void OnDestroy()
     {
-        GameController.OnGameOver -= OnGameOver;
-        GameController.OnGameStart -= OnGameStart;
+        GameManager.OnGameOver -= OnGameOver;
+        GameManager.OnGameStart -= OnGameStart;
     }
     
     private void OnGameOver()

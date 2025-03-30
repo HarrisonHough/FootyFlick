@@ -16,16 +16,16 @@ public class GameCanvas : MonoBehaviour
     {
         Ball.OnBallScoreComplete += OnScore;
         PlayerScore.OnScoreUpdated += OnScoreUpdated;
-        GameController.OnGameOver += OnGameOver;
-        GameController.OnGameStart += OnGameStart;
+        GameManager.OnGameOver += OnGameOver;
+        GameManager.OnGameStart += OnGameStart;
     }
 
     public void OnDestroy()
     {
         Ball.OnBallScoreComplete -= OnScore;
         PlayerScore.OnScoreUpdated -= OnScoreUpdated;
-        GameController.OnGameOver -= OnGameOver;
-        GameController.OnGameStart -= OnGameStart;
+        GameManager.OnGameOver -= OnGameOver;
+        GameManager.OnGameStart -= OnGameStart;
     }
     private void OnGameOver()
     {
@@ -76,18 +76,18 @@ public class GameCanvas : MonoBehaviour
         notificationText.text = "";
 
         
-        switch (ballScoreData.scoreType)
+        switch (ballScoreData.kickResult)
         {
-            case ScoreType.Goal:
+            case KickResult.Goal:
                 notificationText.text = "GOAL!";
                 break;
-            case ScoreType.OutOfBounds: 
+            case KickResult.OutOfBounds: 
                 notificationText.text = "OUT!";
                 break;
-            case ScoreType.Point:
+            case KickResult.Point:
                 notificationText.text = "POINT!";
                 break;
-            case ScoreType.None:
+            case KickResult.None:
                 notificationText.text = "NO SCORE!";
                 break;
         }

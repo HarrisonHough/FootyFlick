@@ -22,14 +22,14 @@ public class PlayerScore : MonoBehaviour
         playerScoreData = new PlayerScoreData();
         Ball.OnBallScoreComplete += OnScore;
         BallLauncher.OnBallLaunched += OnKick;
-        GameController.OnGameStart += ResetScore;
+        GameManager.OnGameStart += ResetScore;
     }
     
     private void OnDestroy()
     {
         Ball.OnBallScoreComplete -= OnScore;
         BallLauncher.OnBallLaunched -= OnKick;
-        GameController.OnGameStart -= ResetScore;
+        GameManager.OnGameStart -= ResetScore;
     }
     
     private void OnKick()
@@ -39,20 +39,20 @@ public class PlayerScore : MonoBehaviour
 
     private void OnScore(BallScoreData ballScoreData)
     {
-        switch (ballScoreData.scoreType)
+        switch (ballScoreData.kickResult)
         {
-            case ScoreType.Goal:
+            case KickResult.Goal:
                 playerScoreData.goalCount++;
                 AddToScore(6);
                 break;
-            case ScoreType.Point:
+            case KickResult.Point:
                 playerScoreData.pointCount++;
                 AddToScore(1);
                 break;
-            case ScoreType.OutOfBounds:
+            case KickResult.OutOfBounds:
                 playerScoreData.outOfBoundsCount++;
                 break;
-            case ScoreType.None:
+            case KickResult.None:
                 break;
         }
     }

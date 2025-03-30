@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class GameController : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     [SerializeField]
     private PlayerController player;
@@ -13,6 +13,8 @@ public class GameController : MonoBehaviour
     public static Action OnGameOver;
     public static Action OnGameStart;
     
+    private IGameMode activeMode;
+    
     private void Start()
     {
         Ball.OnBallScoreComplete += OnBallScoreComplete;
@@ -21,6 +23,37 @@ public class GameController : MonoBehaviour
     private void OnDestroy()
     {
         Ball.OnBallScoreComplete -= OnBallScoreComplete;
+    }
+    
+    private void Update()
+    {
+        activeMode?.Update(Time.deltaTime);
+
+        if (activeMode != null && activeMode.IsGameOver)
+        {
+            ShowGameOverScreen();
+        }
+    }
+    
+    private void SetupGameMode(GameModeType modeType)
+    {
+        switch (modeType)
+        {
+            case GameModeType.GoalOrNothing:
+                activeMode = new GoalOrNothingMode(this);
+                break;
+            case GameModeType.Training:
+                activeMode = new TrainingMode(this);
+                break;
+            case GameModeType.TimeAttack:
+                activeMode = new TimeAttackMode(this);
+                break;
+            case GameModeType.AroundTheWorld:
+                activeMode = new AroundTheWorldMode(this);
+                break;
+        }
+
+        activeMode.StartMode();
     }
 
     public void StartGame()
@@ -32,7 +65,7 @@ public class GameController : MonoBehaviour
 
     public void OnBallScoreComplete(BallScoreData ballScoreData)
     {
-        if (ballScoreData.scoreType == ScoreType.Goal)
+        if (ballScoreData.kickResult == KickResult.Goal)
         {
             StartCoroutine(DelayMovePlayer(1f));
             return;
@@ -43,15 +76,17 @@ public class GameController : MonoBehaviour
     public void RestartGame()
     {
         StartGame();
+        activeMode?.EndMode();
+        SetupGameMode(settings.SelectedMode);
     }
 
     private IEnumerator DelayMovePlayer(float delay)
     {
         yield return new WaitForSeconds(delay);
-        MovePlayer();
+        MovePlayerToRandomPosition();
     }
 
-    private void MovePlayer()
+    public void MovePlayerToRandomPosition()
     {
         player.MoveToPosition(randomPositionInSector.GetRandomPositionInSector());
         WindControl.Instance.RandomizeWindStrength();

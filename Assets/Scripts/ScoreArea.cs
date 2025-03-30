@@ -4,12 +4,12 @@ using UnityEngine.Serialization;
 
 public class ScoreArea : MonoBehaviour, IScoreArea
 {
-    [FormerlySerializedAs("scoringType")] [FormerlySerializedAs("scoringAreaType")] [SerializeField]
-    private ScoreType scoreType;
-
-    public ScoreType ScoreType
+    public KickResult kickResult;
+    public KickResult KickResult
     {
-        get => scoreType;
-        private set => scoreType = value;
+        get => kickResult;
+        private set => kickResult = value;
     }
+
+    
 }
