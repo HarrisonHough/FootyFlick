@@ -97,7 +97,7 @@ public enum ControlMode { Swipe, Drag }
     {
         if (ball == null) SpawnBall();
 
-        ball.LaunchBall(velocity);
+        ball.LaunchBall(velocity, KickStyle.DropPunt, cameraTransform);
         ball.SetWindActive(true);
         ball = null;
         RandomizeWindStrength();
