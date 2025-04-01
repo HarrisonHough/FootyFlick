@@ -1,13 +1,8 @@
 using UnityEngine;
 
-public enum GameModeEnum
-{
-    GoalOrNothing
-}
-
 public static class GamePrefs 
 {
-    private const string GOAL_OR_NOTHING_BEST_SCORE = "GoalOrNothing_BestScore";
+    private const string GOAL_OR_NOTHING_BEST_SCORE = "OnlySnags_BestScore";
     
     public static int GetBestScore(GameModeEnum gameMode)
     {

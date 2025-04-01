@@ -6,7 +6,10 @@ public enum KickResult
     None,
     OutOfBounds,
     Goal,
-    Point
+    Point,
+    HitGoalPost,
+    HitPointPost,
+    BinGoal
 }
 
 public interface IScoreArea

@@ -24,25 +24,26 @@ public class Ball : MonoBehaviour
     
     private bool disableScoring;
     
-    private BallScoreData _ballScoreData;
-    private KickStyle currentKickStyle;
-    public static Action<BallScoreData> OnBallScoreComplete;
+
+    private KickData currentKickData;
+    public static Action<KickData> OnKickComplete;
     private PoolMember poolMember;
     private MeshRenderer ballRenderer;
 
     private void Start()
     {
-        GameManager.OnGameOver += Reset;
+        GameManager.OnGameStateChanged += OnGameStateChanged;
         ballRenderer = GetComponent<MeshRenderer>();
     }
 
     private void OnDestroy()
     {
-        GameManager.OnGameOver -= Reset;
+        GameManager.OnGameStateChanged -= OnGameStateChanged;
     }
 
     private void OnEnable()
     {
+        currentKickData.Result = KickResult.None;
         if(ballRigidbody == null)
         {
             ballRigidbody = GetComponent<Rigidbody>();
@@ -53,6 +54,18 @@ public class Ball : MonoBehaviour
     private void OnDisable()
     {
         StopAllCoroutines();
+    }
+    
+    public void OnGameStateChanged(GameStateEnum gameState)
+    {
+        switch (gameState)
+        {
+            case GameStateEnum.GameOver:
+                Reset();
+                break;
+            default:
+                break;
+        }
     }
 
     private void Reset()
@@ -74,7 +87,6 @@ public class Ball : MonoBehaviour
             poolMember = GetComponent<PoolMember>();
         }
         disableScoring = false;
-        _ballScoreData = new BallScoreData();
         ActivateRigidbody();
         ballRigidbody.linearVelocity = velocity;
         
@@ -82,9 +94,9 @@ public class Ball : MonoBehaviour
         cameraRight.y = 0;
         cameraRight.Normalize();
         
-        currentKickStyle = kickStyle;
+        currentKickData.Style = kickStyle;
         // Set angular velocity based on kick style
-        switch (currentKickStyle)
+        switch (currentKickData.Style)
         {
             default:
                 curvingForceDirection = Vector3.zero;
@@ -113,7 +125,7 @@ public class Ball : MonoBehaviour
             ApplyWindForce();
         }
 
-        if (currentKickStyle != KickStyle.DropPunt)
+        if (currentKickData.Style != KickStyle.DropPunt)
         {
             ApplyCurvingForce();
         }
@@ -143,11 +155,11 @@ public class Ball : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (disableScoring || _ballScoreData.kickResult != KickResult.None || _ballScoreData.goalPostCollisionType != GoalPostType.None) return;
+        if (disableScoring || currentKickData.Result != KickResult.None ) return;
         
         if (other.gameObject.TryGetComponent(out IScoreArea score))
         {
-            _ballScoreData.kickResult = score.KickResult;
+            currentKickData.Result = score.KickResult;
             switch (score.KickResult)
             {
                 case KickResult.OutOfBounds:
@@ -168,18 +180,17 @@ public class Ball : MonoBehaviour
     
     private void OnCollisionEnter(Collision collision)
     {
-        if (_ballScoreData.kickResult == KickResult.OutOfBounds || disableScoring) return;
+        if (currentKickData.Result == KickResult.OutOfBounds || disableScoring) return;
         
         if(collision.gameObject.TryGetComponent(out IGoalPost goalPost))
         {
-            _ballScoreData.goalPostCollisionType = goalPost.GoalPostType;
             switch(goalPost.GoalPostType)
             {
                 case GoalPostType.Goal:
-                    _ballScoreData.kickResult = KickResult.Point;
+                    currentKickData.Result = KickResult.HitGoalPost;
                     break;
                 case GoalPostType.Point:
-                    _ballScoreData.kickResult = KickResult.OutOfBounds;
+                    currentKickData.Result = KickResult.HitPointPost;
                     break;
                 case GoalPostType.None: default:
                     Debug.Log("Goal post is none!");
@@ -208,7 +219,7 @@ public class Ball : MonoBehaviour
     IEnumerator DelayCheckForScore(float delay)
     {
         yield return new WaitForSeconds(delay);
-        if(_ballScoreData.goalPostCollisionType == GoalPostType.None)
+        if(currentKickData.Result != KickResult.HitGoalPost && currentKickData.Result != KickResult.HitPointPost)
         {
             BallScored();
         }
@@ -230,7 +241,8 @@ public class Ball : MonoBehaviour
     private void BallScored()
     {
         // Invoke the scoring event after the loop exits
-        OnBallScoreComplete?.Invoke(_ballScoreData);
+        Debug.Log("BallScored!");
+        OnKickComplete?.Invoke(currentKickData);
         disableScoring = true;
         poolMember.ReturnToPool(1);
         StopAllCoroutines();

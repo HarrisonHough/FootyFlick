@@ -7,96 +7,81 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private PlayerController player;
     [SerializeField]
+    private PlayerScore playerScore;
+    [SerializeField]
     private RandomPositionInSector randomPositionInSector;
-
-    public static Action OnKickReady;
-    public static Action OnGameOver;
-    public static Action OnGameStart;
+    [SerializeField]
+    private GameCanvas gameCanvas;
+    [SerializeField]
+    private GameModePrefabs gameModePrefabs;
     
-    private IGameMode activeMode;
+    public static Action<GameStateEnum> OnGameStateChanged;
+    
+    [SerializeField] private GameModeBase currentGameMode;
     
     private void Start()
     {
-        Ball.OnBallScoreComplete += OnBallScoreComplete;
     }
 
     private void OnDestroy()
     {
-        Ball.OnBallScoreComplete -= OnBallScoreComplete;
+        
+    }
+
+    public static void SetGameState(GameStateEnum gameState)
+    {
+        OnGameStateChanged?.Invoke(gameState);
+    }
+
+    public GameCanvas GetGameCanvas()
+    {
+        return gameCanvas;
     }
     
-    private void Update()
+    public PlayerScore GetPlayerScore()
     {
-        activeMode?.Update(Time.deltaTime);
-
-        if (activeMode != null && activeMode.IsGameOver)
-        {
-            ShowGameOverScreen();
-        }
+        return playerScore;
     }
     
-    private void SetupGameMode(GameModeType modeType)
+    public void SetGameMode(GameModeEnum modeEnum)
     {
-        switch (modeType)
+        if(currentGameMode != null)
         {
-            case GameModeType.GoalOrNothing:
-                activeMode = new GoalOrNothingMode(this);
-                break;
-            case GameModeType.Training:
-                activeMode = new TrainingMode(this);
-                break;
-            case GameModeType.TimeAttack:
-                activeMode = new TimeAttackMode(this);
-                break;
-            case GameModeType.AroundTheWorld:
-                activeMode = new AroundTheWorldMode(this);
-                break;
+            currentGameMode.EndMode();
+            Destroy(currentGameMode.gameObject);
         }
-
-        activeMode.StartMode();
+        var newGameMode = gameModePrefabs.GetGameMode(modeEnum);
+        if (newGameMode == null)
+        {
+            Debug.LogError($"Game mode {modeEnum} not found.");
+            return;
+        }
+        newGameMode = Instantiate(newGameMode, transform);
+        currentGameMode = newGameMode;
+        currentGameMode.Initialize(this);
     }
 
     public void StartGame()
     {
-        OnGameStart?.Invoke();
-        OnKickReady?.Invoke();
-        WindControl.Instance.RandomizeWindStrength();
-    }
-
-    public void OnBallScoreComplete(BallScoreData ballScoreData)
-    {
-        if (ballScoreData.kickResult == KickResult.Goal)
+        if (currentGameMode == null)
         {
-            StartCoroutine(DelayMovePlayer(1f));
-            return;
+            Debug.Log( "Game mode is null, setting default mode.");
+            SetGameMode(GameModeEnum.GoalOrNothing);
         }
-        StartCoroutine(DelayGameOver(1f));
+        OnGameStateChanged?.Invoke(GameStateEnum.GameStarted);
+        currentGameMode.StartMode();
     }
     
-    public void RestartGame()
-    {
-        StartGame();
-        activeMode?.EndMode();
-        SetupGameMode(settings.SelectedMode);
-    }
-
-    private IEnumerator DelayMovePlayer(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        MovePlayerToRandomPosition();
-    }
-
     public void MovePlayerToRandomPosition()
     {
-        player.MoveToPosition(randomPositionInSector.GetRandomPositionInSector());
-        WindControl.Instance.RandomizeWindStrength();
-        OnKickReady?.Invoke();
+        MovePlayerToPosition(randomPositionInSector.GetRandomPositionInSector());
+    }
+    
+    public void MovePlayerToPosition( Vector3 position)
+    {
+        player.MoveToPosition(position);
     }
 
-    private IEnumerator DelayGameOver(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        OnGameOver?.Invoke();
-    }
+
 }
 

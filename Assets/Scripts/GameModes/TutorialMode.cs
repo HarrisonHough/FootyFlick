@@ -1,39 +1,46 @@
-public class TutorialMode : IGameMode
+using UnityEngine;
+
+public class TutorialMode : GameModeBase
 {
-    private GameManager game;
+    [SerializeField] private TutorialPanel tutorialPanelPrefab;
+    
     private int tutorialStep = 0;
     private bool gameOver = false;
+    private TutorialPanel tutorialPanel;
+    
+    public override void Initialize(GameManager gameManager)
+    {
+        this.gameManager = gameManager;
+        var gameCanvas = gameManager.GetGameCanvas();
+        tutorialPanel = Instantiate(tutorialPanelPrefab, gameCanvas.transform);
+    }
 
-    public TutorialMode(GameManager gm) => game = gm;
-
-    public void StartMode()
+    public override void StartMode()
     {
         tutorialStep = 0;
         StartStep0();
     }
 
-    public void Update(float deltaTime) { }
-
-    public void OnKickResult(KickResult result)
+    public override void OnKickResult(KickData kickData)
     {
         switch (tutorialStep)
         {
             case 0:
-                if (result == KickResult.Goal)
+                if (kickData.Result == KickResult.Goal)
                 {
                     tutorialStep++;
                     StartStep1();
                 }
                 break;
             case 1:
-                if (result == KickResult.Goal)
+                if (kickData.Result == KickResult.Goal)
                 {
                     tutorialStep++;
                     StartStep2();
                 }
                 break;
             case 2:
-                if (result == KickResult.Goal && game.CurrentKickStyle != KickStyle.DropPunt)
+                if (kickData.Result == KickResult.Goal && kickData.Style != KickStyle.DropPunt)
                 {
                     FinishTutorial();
                 }
@@ -41,15 +48,19 @@ public class TutorialMode : IGameMode
         }
     }
 
-    public bool IsGameOver => gameOver;
-
-    public string GetStatusText() => "Tutorial"; // You could return step text too
-
-    public void EndMode() { }
+    public override void EndMode()
+    {
+        if (tutorialPanel != null)
+        {
+            Destroy(tutorialPanel.gameObject);
+        }
+        tutorialPanel = null;
+    }
 
     private void StartStep0()
     {
         WindControl.Instance.SetWindStrength(0);
+        tutorialPanel.ShowKickTutorial();
         //game.SetPlayerPosition(TutorialPositions.Easy);
         //game.ui.ShowTutorialPanel("Swipe to kick!");
     }
@@ -57,6 +68,7 @@ public class TutorialMode : IGameMode
     private void StartStep1()
     {
         WindControl.Instance.SetWindStrength(1);
+        tutorialPanel.ShowWindTutorial();
         //game.SetPlayerPosition(TutorialPositions.Center);
         //game.ui.ShowTutorialPanel("Wind affects the ball. Swipe slightly right to compensate.");
     }
@@ -64,6 +76,7 @@ public class TutorialMode : IGameMode
     private void StartStep2()
     {
         WindControl.Instance.SetWindStrength(0);
+        tutorialPanel.ShowKickStyleTutorial();
         //game.SetPlayerPosition(TutorialPositions.TightAngle);
         //game.ui.ShowTutorialPanel("Swipe down-right to change to snap kick. Try curving it through!");
     }

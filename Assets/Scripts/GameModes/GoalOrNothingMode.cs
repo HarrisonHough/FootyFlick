@@ -1,41 +1,89 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
-public class GoalOrNothingMode : IGameMode
+public class GoalOrNothingMode : GameModeBase
 {
-    private GameManager game;
-    private int score = 0;
+    [SerializeField]
+    private GameOverPanel gameOverPanelPrefab;
+
     private bool gameOver = false;
 
-    public GoalOrNothingMode(GameManager gm) => game = gm;
-
-    public void StartMode()
+    private GameOverPanel gameOverPanel;
+    private PlayerScore playerScore;
+    
+    public override void Initialize(GameManager gameManager)
     {
-        score = 0;
-        game.MovePlayerToRandomPosition();
+        this.gameManager = gameManager;
+        playerScore = gameManager.GetPlayerScore();
+        var gameCanvas = gameManager.GetGameCanvas();
+        gameOverPanel = Instantiate(gameOverPanelPrefab, gameCanvas.transform);
+        gameOverPanel.gameObject.SetActive(false);
+        gameOverPanel.OnHomeButtonClicked += OnHomeButtonClicked;
+        gameOverPanel.OnRetryButtonClicked += OnRetryButtonClicked;
+        Ball.OnKickComplete += OnKickResult;
+    }
+
+    private void OnRetryButtonClicked()
+    {
+        GameManager.SetGameState(GameStateEnum.GameStarted);
+        gameManager.MovePlayerToRandomPosition();
         WindControl.Instance.RandomizeWindStrength();
+        GameManager.SetGameState(GameStateEnum.GameKicking);
+        gameOverPanel.gameObject.SetActive(false);
     }
 
-    public void OnKickResult(KickResult result)
+    private void OnHomeButtonClicked()
     {
-        if (result == KickResult.Goal)
-            score += 6;
-        else if (result == KickResult.Point)
-            score += 1;
-        else
-            gameOver = true;
-
-        if (!gameOver)
-        {
-            game.MovePlayerToRandomPosition();
-            WindControl.Instance.RandomizeWindStrength();
-        }
+        gameOverPanel.gameObject.SetActive(false);
+        GameManager.SetGameState(GameStateEnum.Home);
     }
 
-    public void Update(float deltaTime) { }
+    public override void StartMode()
+    {
+        gameManager.MovePlayerToRandomPosition();
+        WindControl.Instance.RandomizeWindStrength();
+        GameManager.SetGameState(GameStateEnum.GameKicking);
+    }
 
-    public bool IsGameOver => gameOver;
+    public override void OnKickResult(KickData kickData)
+    {
+        playerScore.AddKickData(kickData);
+        if (kickData.Result != KickResult.Goal)
+        {
+            gameOver = true;
+            StopAllCoroutines();
+            StartCoroutine( DelayGameOver(1f));
+            return;
+        }
+        StopAllCoroutines();
+        StartCoroutine(DelayMovePlayer (1f));
+    }
 
-    public string GetStatusText() => $"Score: {score}";
-
-    public void EndMode() { }
+    public override void EndMode()
+    {
+        gameOverPanel.gameObject.SetActive(false);
+        gameOverPanel.OnHomeButtonClicked -= OnHomeButtonClicked;
+        gameOverPanel.OnRetryButtonClicked -= OnRetryButtonClicked;
+        Destroy(gameOverPanel?.gameObject);
+    }
+    
+    private IEnumerator DelayMovePlayer(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        gameManager.MovePlayerToRandomPosition();
+        WindControl.Instance.RandomizeWindStrength();
+        GameManager.SetGameState(GameStateEnum.GameKicking);
+    }
+    
+    private IEnumerator DelayGameOver(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        GameManager.SetGameState(GameStateEnum.GameOver);
+        gameOverPanel.gameObject.SetActive(true);
+    }
+    
+    private void OnDestroy()
+    {
+        Ball.OnKickComplete -= OnKickResult;
+    }
 }

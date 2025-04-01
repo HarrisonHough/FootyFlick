@@ -14,18 +14,31 @@ public class GameCanvas : MonoBehaviour
 
     private void Start()
     {
-        Ball.OnBallScoreComplete += OnScore;
+        Ball.OnKickComplete += OnScore;
         PlayerScore.OnScoreUpdated += OnScoreUpdated;
-        GameManager.OnGameOver += OnGameOver;
-        GameManager.OnGameStart += OnGameStart;
+        GameManager.OnGameStateChanged += OnGameStateChanged;
+    }
+
+    private void OnGameStateChanged(GameStateEnum gameState)
+    {
+        switch (gameState)
+        {
+            case GameStateEnum.GameStarted:
+                OnGameStart();
+                break;
+            case GameStateEnum.GameOver:
+                OnGameOver();
+                break;
+            default:
+                break;
+        }
     }
 
     public void OnDestroy()
     {
-        Ball.OnBallScoreComplete -= OnScore;
+        Ball.OnKickComplete -= OnScore;
         PlayerScore.OnScoreUpdated -= OnScoreUpdated;
-        GameManager.OnGameOver -= OnGameOver;
-        GameManager.OnGameStart -= OnGameStart;
+        GameManager.OnGameStateChanged -= OnGameStateChanged;
     }
     private void OnGameOver()
     {
@@ -53,19 +66,19 @@ public class GameCanvas : MonoBehaviour
 
     private void OnScoreUpdated(PlayerScoreData playerScoreData)
     {
-        if (playerScoreData.score == 0)
+        if (playerScoreData.Score == 0)
         {
-            scoreText.text = playerScoreData.score.ToString();
+            scoreText.text = playerScoreData.Score.ToString();
             return;
         }
         scoreText.rectTransform.DOScale( new Vector3(1.2f, 1.2f, 1.2f), 0.3f).OnComplete(() =>
         {
-            scoreText.text = playerScoreData.score.ToString();
+            scoreText.text = playerScoreData.Score.ToString();
             scoreText.rectTransform.DOScale( new Vector3(1f, 1f, 1f), 0.2f);
         });
     }
 
-    public void OnScore(BallScoreData ballScoreData)
+    public void OnScore(KickData kickData)
     {
         if(notificationText == null)
         {
@@ -76,7 +89,7 @@ public class GameCanvas : MonoBehaviour
         notificationText.text = "";
 
         
-        switch (ballScoreData.kickResult)
+        switch (kickData.Result)
         {
             case KickResult.Goal:
                 notificationText.text = "GOAL!";
@@ -90,17 +103,17 @@ public class GameCanvas : MonoBehaviour
             case KickResult.None:
                 notificationText.text = "NO SCORE!";
                 break;
-        }
-
-        switch (ballScoreData.goalPostCollisionType)
-        {
-            case GoalPostType.Goal:
+            case KickResult.HitGoalPost:
                 notificationText.text = "HIT THE POST!";
                 break;
-            case GoalPostType.Point:
-                notificationText.text = "OUT!";
+            case KickResult.HitPointPost:
+                notificationText.text = "OUT ON THE FULL!";
+                break;
+            case KickResult.BinGoal:
+                notificationText.text = "SWISH!";
                 break;
         }
+        
         notificationText.rectTransform.DOScale( new Vector3(1.2f, 1.2f, 1.2f), 0.3f).OnComplete(() =>
         {
             notificationText.rectTransform.DOScale( new Vector3(1f, 1f, 1f), 0.2f);

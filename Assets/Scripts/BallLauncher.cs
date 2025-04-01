@@ -39,12 +39,19 @@ public class BallLauncher : MonoBehaviour
 
     private void Start()
     {
-        GameManager.OnKickReady += OnKickReady;
+        GameManager.OnGameStateChanged += OnGameStateChanged;
+    }
+
+    private void OnGameStateChanged(GameStateEnum gameState)
+    {
+        if (gameState != GameStateEnum.GameKicking) return; 
+        OnKickReady();
+        
     }
 
     private void OnDestroy()
     {
-        GameManager.OnKickReady -= OnKickReady;
+        GameManager.OnGameStateChanged -= OnGameStateChanged;
     }
 
     private void OnKickReady()
@@ -143,9 +150,7 @@ public class BallLauncher : MonoBehaviour
             SetKickStyle(KickStyle.SnapRight); // Down-right
         }
     }
-
-
-
+    
     private Vector3 CalculateLaunchVelocity(SwipeData swipeData)
     {
         // Ignore swipes with a downward or neutral vertical component
@@ -189,6 +194,7 @@ public class BallLauncher : MonoBehaviour
         {
             return;
         }
+        GameManager.SetGameState(GameStateEnum.GameKicked);
         currentBall.transform.parent = null;
         currentBall.LaunchBall(launchVelocity, currentKickStyle, camera.transform);
         currentBall = null;
