@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class TutorialMode : GameModeBase
@@ -7,36 +8,41 @@ public class TutorialMode : GameModeBase
     private int tutorialStep = 0;
     private bool gameOver = false;
     private TutorialPanel tutorialPanel;
+    private GameCanvas gameCanvas;
     
     public override void Initialize(GameManager gameManager)
     {
         this.gameManager = gameManager;
-        var gameCanvas = gameManager.GetGameCanvas();
+        gameCanvas = gameManager.GetGameCanvas();
         tutorialPanel = Instantiate(tutorialPanelPrefab, gameCanvas.transform);
+        Ball.OnKickComplete += OnKickResult;
     }
 
     public override void StartMode()
     {
+        gameCanvas = gameManager.GetGameCanvas();
+        gameCanvas.HideWindPanel();
         tutorialStep = 0;
         StartStep0();
     }
 
     public override void OnKickResult(KickData kickData)
     {
+
         switch (tutorialStep)
         {
             case 0:
                 if (kickData.Result == KickResult.Goal)
                 {
                     tutorialStep++;
-                    StartStep1();
+                    StartCoroutine(DelayStep1(1f));
                 }
                 break;
             case 1:
                 if (kickData.Result == KickResult.Goal)
                 {
                     tutorialStep++;
-                    StartStep2();
+                    StartCoroutine(DelayStep2(1f));;
                 }
                 break;
             case 2:
@@ -46,6 +52,12 @@ public class TutorialMode : GameModeBase
                 }
                 break;
         }
+        
+        if(kickData.Result != KickResult.Goal)
+        {
+            GameManager.SetGameState(GameStateEnum.GameKicking);
+        }
+
     }
 
     public override void EndMode()
@@ -61,29 +73,32 @@ public class TutorialMode : GameModeBase
     {
         WindControl.Instance.SetWindStrength(0);
         tutorialPanel.ShowKickTutorial();
+        GameManager.SetGameState(GameStateEnum.GameKicking);
         //game.SetPlayerPosition(TutorialPositions.Easy);
         //game.ui.ShowTutorialPanel("Swipe to kick!");
     }
-
-    private void StartStep1()
+    
+    private IEnumerator DelayStep1(float delay)
     {
-        WindControl.Instance.SetWindStrength(1);
+        yield return new WaitForSeconds(delay);
+        WindControl.Instance.SetWindStrength(-1);
         tutorialPanel.ShowWindTutorial();
-        //game.SetPlayerPosition(TutorialPositions.Center);
-        //game.ui.ShowTutorialPanel("Wind affects the ball. Swipe slightly right to compensate.");
+        GameManager.SetGameState(GameStateEnum.GameKicking);
     }
 
-    private void StartStep2()
+    private IEnumerator DelayStep2(float delay)
     {
+        yield return new WaitForSeconds(delay);
         WindControl.Instance.SetWindStrength(0);
         tutorialPanel.ShowKickStyleTutorial();
+        GameManager.SetGameState(GameStateEnum.GameKicking);
         //game.SetPlayerPosition(TutorialPositions.TightAngle);
         //game.ui.ShowTutorialPanel("Swipe down-right to change to snap kick. Try curving it through!");
     }
 
     private void FinishTutorial()
     {
-        //game.ui.ShowTutorialPanel("You're ready! Let's play.");
+        tutorialPanel.ShowTutorialComplete();
         gameOver = true;
     }
 }

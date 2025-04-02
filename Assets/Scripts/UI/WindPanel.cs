@@ -8,13 +8,13 @@ public class WindPanel : MonoBehaviour
     private WindControl windControl;
     [SerializeField]
     private Animator animator;
-    private void Awake()
+    private void OnEnable()
     {
         WindControl.OnWindChanged += OnWindChanged;
         BallLauncher.OnBallLaunched += OnBallLaunched;
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         WindControl.OnWindChanged -= OnWindChanged;
         BallLauncher.OnBallLaunched -= OnBallLaunched;

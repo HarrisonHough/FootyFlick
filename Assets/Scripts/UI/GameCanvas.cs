@@ -52,11 +52,14 @@ public class GameCanvas : MonoBehaviour
         scoreText.gameObject.SetActive(isVisible);
     }
     
-    private void ShowUI()
+    public void HideWindPanel()
     {
         windPanel.gameObject.SetActive(false);
-        notificationText.gameObject.SetActive(false);
-        scoreText.gameObject.SetActive(false);
+    }
+    
+    public void ShowWindPanel()
+    {
+        windPanel.gameObject.SetActive(true);
     }
 
     private void OnGameStart()
@@ -124,6 +127,7 @@ public class GameCanvas : MonoBehaviour
     
     private void ResetUI()
     {
+        Debug.Log("Resetting UI");
         SetUIVisibility(true);
         notificationText.text = "";
         scoreText.text = "0";

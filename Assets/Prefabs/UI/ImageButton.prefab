@@ -85,7 +85,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1609106948948362240, guid: 404cac14d616459429521266874dc743, type: 3}
       propertyPath: m_Name
-      value: ImageButton Variant
+      value: ImageButton
       objectReference: {fileID: 0}
     - target: {fileID: 8243620950113333281, guid: 404cac14d616459429521266874dc743, type: 3}
       propertyPath: m_Pivot.x
