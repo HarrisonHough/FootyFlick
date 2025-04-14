@@ -90,12 +90,12 @@ public class PlayerScore : MonoBehaviour
     public void AddToScore(int score)
     {
         playerScoreData.Score += score;
-        OnScoreUpdated.Invoke(GetScoreData);
+        OnScoreUpdated?.Invoke(GetScoreData);
     }
 
     public void ResetScore()
     {
         GetScoreData = new PlayerScoreData();
-        OnScoreUpdated.Invoke(GetScoreData);
+        OnScoreUpdated?.Invoke(GetScoreData);
     }
 }

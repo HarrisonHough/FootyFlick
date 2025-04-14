@@ -3,12 +3,15 @@ using UnityEngine;
 
 public class GoalOrNothingMode : GameModeBase
 {
+    [SerializeField] 
+    private GameScorePanelBase gameGameScorePanelPrefab;
     [SerializeField]
-    private GameOverPanel gameOverPanelPrefab;
+    private GoalOrNothingGameOverPanel goalOrNothingGameOverPanelPrefab;
 
     private bool gameOver = false;
 
-    private GameOverPanel gameOverPanel;
+    private GoalOrNothingGameOverPanel goalOrNothingGameOverPanel;
+    private GameScorePanelBase gameScorePanel;
     private PlayerScore playerScore;
     
     public override void Initialize(GameManager gameManager)
@@ -16,25 +19,23 @@ public class GoalOrNothingMode : GameModeBase
         this.gameManager = gameManager;
         playerScore = gameManager.GetPlayerScore();
         var gameCanvas = gameManager.GetGameCanvas();
-        gameOverPanel = Instantiate(gameOverPanelPrefab, gameCanvas.transform);
-        gameOverPanel.gameObject.SetActive(false);
-        gameOverPanel.OnHomeButtonClicked += OnHomeButtonClicked;
-        gameOverPanel.OnRetryButtonClicked += OnRetryButtonClicked;
+        goalOrNothingGameOverPanel = Instantiate(goalOrNothingGameOverPanelPrefab, gameCanvas.transform);
+        goalOrNothingGameOverPanel.gameObject.SetActive(false);
+        goalOrNothingGameOverPanel.OnHomeButtonClicked += OnHomeButtonClicked;
+        goalOrNothingGameOverPanel.OnRetryButtonClicked += OnRetryButtonClicked;
+        gameScorePanel = Instantiate(gameGameScorePanelPrefab, gameCanvas.transform);
         Ball.OnKickComplete += OnKickResult;
     }
 
     private void OnRetryButtonClicked()
     {
         GameManager.SetGameState(GameStateEnum.GameStarted);
-        gameManager.MovePlayerToRandomPosition();
-        WindControl.Instance.RandomizeWindStrength();
-        GameManager.SetGameState(GameStateEnum.GameKicking);
-        gameOverPanel.gameObject.SetActive(false);
+        StartMode();
     }
 
     private void OnHomeButtonClicked()
     {
-        gameOverPanel.gameObject.SetActive(false);
+        goalOrNothingGameOverPanel.gameObject.SetActive(false);
         GameManager.SetGameState(GameStateEnum.Home);
     }
 
@@ -43,6 +44,7 @@ public class GoalOrNothingMode : GameModeBase
         gameManager.MovePlayerToRandomPosition();
         WindControl.Instance.RandomizeWindStrength();
         GameManager.SetGameState(GameStateEnum.GameKicking);
+        goalOrNothingGameOverPanel.gameObject.SetActive(false);
     }
 
     public override void OnKickResult(KickData kickData)
@@ -61,10 +63,12 @@ public class GoalOrNothingMode : GameModeBase
 
     public override void EndMode()
     {
-        gameOverPanel.gameObject.SetActive(false);
-        gameOverPanel.OnHomeButtonClicked -= OnHomeButtonClicked;
-        gameOverPanel.OnRetryButtonClicked -= OnRetryButtonClicked;
-        Destroy(gameOverPanel?.gameObject);
+        goalOrNothingGameOverPanel.gameObject.SetActive(false);
+        goalOrNothingGameOverPanel.OnHomeButtonClicked -= OnHomeButtonClicked;
+        goalOrNothingGameOverPanel.OnRetryButtonClicked -= OnRetryButtonClicked;
+        Destroy(goalOrNothingGameOverPanel?.gameObject);
+        Destroy(gameScorePanel?.gameObject);
+        Ball.OnKickComplete -= OnKickResult;
     }
     
     private IEnumerator DelayMovePlayer(float delay)
@@ -79,7 +83,8 @@ public class GoalOrNothingMode : GameModeBase
     {
         yield return new WaitForSeconds(delay);
         GameManager.SetGameState(GameStateEnum.GameOver);
-        gameOverPanel.gameObject.SetActive(true);
+        goalOrNothingGameOverPanel.UpdateText(playerScore.GetScoreData);
+        goalOrNothingGameOverPanel.gameObject.SetActive(true);
     }
     
     private void OnDestroy()

@@ -288,7 +288,7 @@ GameObject:
   - component: {fileID: 44368613956839818}
   - component: {fileID: 5748980844509289545}
   m_Layer: 0
-  m_Name: GameOverPanel
+  m_Name: GoalOrNothingGameOverPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

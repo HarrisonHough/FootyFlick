@@ -44,4 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ee8b00ba2784b2abbc4ac07ea6ffd26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameOverPanelPrefab: {fileID: 5748980844509289545, guid: bc0136ebe19966a4086fe84217cf057c, type: 3}
+  gameGameScorePanelPrefab: {fileID: 4562436321761640652, guid: eac980476d9537c45b9044f7b8489289, type: 3}
+  goalOrNothingGameOverPanelPrefab: {fileID: 5748980844509289545, guid: bc0136ebe19966a4086fe84217cf057c, type: 3}

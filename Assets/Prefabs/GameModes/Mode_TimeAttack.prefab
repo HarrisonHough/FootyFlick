@@ -44,4 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2f7f690a62184f4c86829ddc6754c0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameScorePanelPrefab: {fileID: 2386000492580788773, guid: 7c5d44310eb6a9a419035de0af07e06a, type: 3}
+  gameOverPanelPrefab: {fileID: 1404119153006069466, guid: 7e383a95e0b5ff54eaeaf8d26a6c4d11, type: 3}
   timeLimit: 60
