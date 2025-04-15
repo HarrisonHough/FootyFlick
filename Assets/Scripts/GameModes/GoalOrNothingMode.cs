@@ -3,15 +3,12 @@ using UnityEngine;
 
 public class GoalOrNothingMode : GameModeBase
 {
-    [SerializeField] 
-    private GameScorePanelBase gameGameScorePanelPrefab;
     [SerializeField]
-    private GoalOrNothingGameOverPanel goalOrNothingGameOverPanelPrefab;
-
-    private bool gameOver = false;
-
     private GoalOrNothingGameOverPanel goalOrNothingGameOverPanel;
+    [SerializeField]
     private GameScorePanelBase gameScorePanel;
+    
+    private bool gameOver = false;
     private PlayerScore playerScore;
     
     public override void Initialize(GameManager gameManager)
@@ -19,11 +16,9 @@ public class GoalOrNothingMode : GameModeBase
         this.gameManager = gameManager;
         playerScore = gameManager.GetPlayerScore();
         var gameCanvas = gameManager.GetGameCanvas();
-        goalOrNothingGameOverPanel = Instantiate(goalOrNothingGameOverPanelPrefab, gameCanvas.transform);
         goalOrNothingGameOverPanel.gameObject.SetActive(false);
         goalOrNothingGameOverPanel.OnHomeButtonClicked += OnHomeButtonClicked;
         goalOrNothingGameOverPanel.OnRetryButtonClicked += OnRetryButtonClicked;
-        gameScorePanel = Instantiate(gameGameScorePanelPrefab, gameCanvas.transform);
         Ball.OnKickComplete += OnKickResult;
     }
 
@@ -45,6 +40,7 @@ public class GoalOrNothingMode : GameModeBase
         WindControl.Instance.RandomizeWindStrength();
         GameManager.SetGameState(GameStateEnum.GameKicking);
         goalOrNothingGameOverPanel.gameObject.SetActive(false);
+        gameOver = false;
     }
 
     public override void OnKickResult(KickData kickData)

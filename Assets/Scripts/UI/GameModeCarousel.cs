@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class GameModeCarouselUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
+public class CarouselUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
 {
     [SerializeField] private RectTransform content;
     [SerializeField] private float panelWidth = 800f;
@@ -76,11 +76,11 @@ public class GameModeCarouselUI : MonoBehaviour, IBeginDragHandler, IEndDragHand
 
     private void UpdatePanelStates()
     {
-        for (int i = 0; i < panelCount; i++)
+        for (var i = 0; i < panelCount; i++)
         {
-            GameModePanel panel = content.GetChild(i).GetComponent<GameModePanel>();
-            if (panel != null)
-                panel.AnimateToActive(i == currentIndex);
+            var carouselElement = content.GetChild(i).GetComponent<CarouselElement>();
+            if (carouselElement != null)
+                carouselElement.AnimateToActive(i == currentIndex);
         }
     }
 

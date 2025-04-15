@@ -3,7 +3,7 @@ using System;
 [Serializable]
 public enum GameModeEnum
 {
-    Tutorial,
+    Practice,
     TimeAttack,
     GoalOrNothing,
     RoundTheWorld,

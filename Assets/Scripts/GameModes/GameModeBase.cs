@@ -8,5 +8,4 @@ public abstract class GameModeBase : MonoBehaviour
     public abstract void StartMode();
     public abstract void OnKickResult(KickData kickData);
     public virtual void EndMode() { }
-    
 }

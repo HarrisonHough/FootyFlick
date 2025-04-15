@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -14,13 +13,18 @@ public class GameManager : MonoBehaviour
     private GameCanvas gameCanvas;
     [SerializeField]
     private GameModePrefabs gameModePrefabs;
+    [SerializeField]
+    private WindControl windControl;
+    public WindControl WindControl => windControl;
     
     public static Action<GameStateEnum> OnGameStateChanged;
     
     [SerializeField] private GameModeBase currentGameMode;
     
+    
     private void Start()
     {
+        windControl = GetComponent<WindControl>();
     }
 
     private void OnDestroy()

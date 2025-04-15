@@ -1,9 +1,10 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "GameModePrefabs", menuName = "ScriptableObjects/GameModePrefabs", order = 1)]
 public class GameModePrefabs : ScriptableObject
 {
-    public TutorialMode TutorialMode;
+    [FormerlySerializedAs("trainingMode"),FormerlySerializedAs("TutorialMode")] public PracticeMode practiceMode;
     public GoalOrNothingMode GoalOrNothingMode;
     public GameModeTimeAttack TimeAttackMode;
 
@@ -11,8 +12,8 @@ public class GameModePrefabs : ScriptableObject
     {
         switch (gameModeEnum)
         {
-            case GameModeEnum.Tutorial:
-                return TutorialMode;
+            case GameModeEnum.Practice:
+                return practiceMode;
             case GameModeEnum.GoalOrNothing:
                 return GoalOrNothingMode;
             case GameModeEnum.TimeAttack:

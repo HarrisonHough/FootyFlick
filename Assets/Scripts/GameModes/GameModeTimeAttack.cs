@@ -3,24 +3,21 @@ using UnityEngine;
 
 public class GameModeTimeAttack : GameModeBase
 {
-    [SerializeField] private TimeAttackGameScorePanel gameScorePanelPrefab;
-    [SerializeField] private TimeAttackGameOver gameOverPanelPrefab;
+    [SerializeField]
+    private TimeAttackGameScorePanel gameScorePanel;
+    [SerializeField]
+    private TimeAttackGameOver gameOverUI;
     [SerializeField] private float timeLimit = 60f;
 
     private float timer;
     private int score;
     private bool gameOver;
-    
-    private TimeAttackGameScorePanel gameScorePanel;
-    private TimeAttackGameOver gameOverUI;
     private PlayerScore playerScore;
     public override void Initialize(GameManager gameManager)
     {
         this.gameManager = gameManager;
         playerScore = gameManager.GetPlayerScore();
         var gameCanvas = gameManager.GetGameCanvas();
-        gameScorePanel = Instantiate(gameScorePanelPrefab, gameCanvas.transform);
-        gameOverUI = Instantiate(gameOverPanelPrefab, gameCanvas.transform);
         gameOverUI.OnHomeButtonClicked += OnHomeButtonClicked;
         gameOverUI.OnRetryButtonClicked += OnRetryButtonClicked;
         gameOverUI.gameObject.SetActive(false);
@@ -37,6 +34,7 @@ public class GameModeTimeAttack : GameModeBase
     private void OnHomeButtonClicked()
     {
         gameOverUI.gameObject.SetActive(false);
+        gameScorePanel.gameObject.SetActive(false);
         GameManager.SetGameState(GameStateEnum.Home);
     }
 
@@ -60,8 +58,8 @@ public class GameModeTimeAttack : GameModeBase
         GameManager.SetGameState(GameStateEnum.GameStarted);
         gameOverUI.OnHomeButtonClicked -= OnHomeButtonClicked;
         gameOverUI.OnRetryButtonClicked -= OnRetryButtonClicked;
-        Destroy(gameScorePanel?.gameObject);
-        Destroy(gameOverUI?.gameObject);
+        Destroy(gameScorePanel.gameObject);
+        Destroy(gameOverUI.gameObject);
         Ball.OnKickComplete -= OnKickResult;
     }
 
@@ -74,13 +72,13 @@ public class GameModeTimeAttack : GameModeBase
 
         if (!gameOver && timer <= 0f)
         {
-            gameOver = true;
             GameOver();
         }
     }
 
     private void GameOver()
     {
+        gameOver = true;
         gameOverUI.UpdateText(playerScore.GetScoreData);
         gameOverUI.gameObject.SetActive(true);
         GameManager.SetGameState(GameStateEnum.GameOver);
