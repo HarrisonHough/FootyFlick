@@ -5,16 +5,15 @@ public class WindPanel : MonoBehaviour
     [SerializeField]
     private RectTransform windArrow;
     [SerializeField]
-    private WindControl windControl;
-    [SerializeField]
     private Animator animator;
-    private void Awake()
+    
+    private void OnEnable()
     {
         WindControl.OnWindChanged += OnWindChanged;
         BallLauncher.OnBallLaunched += OnBallLaunched;
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         WindControl.OnWindChanged -= OnWindChanged;
         BallLauncher.OnBallLaunched -= OnBallLaunched;
@@ -28,7 +27,7 @@ public class WindPanel : MonoBehaviour
     public void OnWindChanged(WindData windData)
     {
         animator.speed = 1f;
-        var angle = Mathf.Lerp(90, -90, Mathf.InverseLerp(-windControl.WindStrengthRange, windControl.WindStrengthRange, windData.Force));
+        var angle = Mathf.Lerp(90, -90, Mathf.InverseLerp(-WindControl.Instance.WindStrengthRange, WindControl.Instance.WindStrengthRange, windData.Force));
         windArrow.localEulerAngles = new Vector3(0, 0, angle);
     }
 }

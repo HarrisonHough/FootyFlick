@@ -34,4 +34,11 @@ public class WindControl : MonoBehaviour
         windData.Direction = cameraTransform.right.normalized;
         OnWindChanged?.Invoke(windData);
     }
+    
+    public void SetWindStrength(float strength)
+    {
+        windData.Force = strength;
+        windData.Direction = cameraTransform.right.normalized;
+        OnWindChanged?.Invoke(windData);
+    }
 }

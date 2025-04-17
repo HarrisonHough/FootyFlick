@@ -67,15 +67,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: Button
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f00aad0e7d3453a4f9674894093c26bd, type: 2}
+  m_sharedMaterial: {fileID: 8140788201376789057, guid: f00aad0e7d3453a4f9674894093c26bd, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281216558
-  m_fontColor: {r: 0.1792453, g: 0.1792453, b: 0.1792453, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -146,7 +146,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1609106948948362240, guid: 404cac14d616459429521266874dc743, type: 3}
       propertyPath: m_Name
-      value: BaseButton Variant
+      value: TextButton
       objectReference: {fileID: 0}
     - target: {fileID: 4389840640158246251, guid: 404cac14d616459429521266874dc743, type: 3}
       propertyPath: m_text
@@ -182,7 +182,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8243620950113333281, guid: 404cac14d616459429521266874dc743, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 80
+      value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 8243620950113333281, guid: 404cac14d616459429521266874dc743, type: 3}
       propertyPath: m_LocalPosition.x

@@ -3,12 +3,17 @@ using UnityEngine;
 
 public struct PlayerScoreData
 {
-    public int score;
-    public int kickCount;
-    public float accuracy;
-    public int goalCount;
-    public int pointCount;
-    public int outOfBoundsCount;
+    public int Score;
+    public int KickCount;
+    public float Accuracy;
+    public int GoalCount;
+    public int PointCount;
+    public int OutOfBoundsCount;
+    public int HitGoalPostCount;
+    public int HitPointPostCount;
+    public int BinGoalCount;
+    public int DropPuntKickCount;
+    public int BananaKickCount;
 }
 
 public class PlayerScore : MonoBehaviour
@@ -20,39 +25,58 @@ public class PlayerScore : MonoBehaviour
     private void Start()
     {
         playerScoreData = new PlayerScoreData();
-        Ball.OnBallScoreComplete += OnScore;
-        BallLauncher.OnBallLaunched += OnKick;
-        GameController.OnGameStart += ResetScore;
-    }
-    
-    private void OnDestroy()
-    {
-        Ball.OnBallScoreComplete -= OnScore;
-        BallLauncher.OnBallLaunched -= OnKick;
-        GameController.OnGameStart -= ResetScore;
-    }
-    
-    private void OnKick()
-    {
-        playerScoreData.kickCount++;
+        GameManager.OnGameStateChanged += OnGameStateChanged;
     }
 
-    private void OnScore(BallScoreData ballScoreData)
+    private void OnGameStateChanged(GameStateEnum gameState)
     {
-        switch (ballScoreData.scoreType)
+        if (gameState == GameStateEnum.GameStarted)
         {
-            case ScoreType.Goal:
-                playerScoreData.goalCount++;
+            ResetScore();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.OnGameStateChanged -= OnGameStateChanged;
+    }
+    
+    public void AddKickData(KickData kickData)
+    {
+        playerScoreData.KickCount++;
+        switch (kickData.Result)
+        {
+            case KickResult.Goal:
+                playerScoreData.GoalCount++;
                 AddToScore(6);
                 break;
-            case ScoreType.Point:
-                playerScoreData.pointCount++;
+            case KickResult.Point:
+                playerScoreData.PointCount++;
                 AddToScore(1);
                 break;
-            case ScoreType.OutOfBounds:
-                playerScoreData.outOfBoundsCount++;
+            case KickResult.OutOfBounds:
+                playerScoreData.OutOfBoundsCount++;
                 break;
-            case ScoreType.None:
+            case KickResult.HitGoalPost:
+                playerScoreData.HitGoalPostCount++;
+                break;
+            case KickResult.HitPointPost:
+                playerScoreData.HitPointPostCount++;
+                break;
+            case KickResult.None:
+                break;
+        }
+        playerScoreData.Accuracy = (float)playerScoreData.GoalCount / playerScoreData.KickCount * 100f;
+
+        switch (kickData.Style)
+        {
+            case KickStyle.DropPunt:
+                playerScoreData.DropPuntKickCount++;
+                break;
+            case KickStyle.SnapLeft:case KickStyle.SnapRight:
+                playerScoreData.BananaKickCount++;
+                break;
+            default:
                 break;
         }
     }
@@ -65,13 +89,13 @@ public class PlayerScore : MonoBehaviour
 
     public void AddToScore(int score)
     {
-        playerScoreData.score += score;
-        OnScoreUpdated.Invoke(GetScoreData);
+        playerScoreData.Score += score;
+        OnScoreUpdated?.Invoke(GetScoreData);
     }
 
     public void ResetScore()
     {
         GetScoreData = new PlayerScoreData();
-        OnScoreUpdated.Invoke(GetScoreData);
+        OnScoreUpdated?.Invoke(GetScoreData);
     }
 }

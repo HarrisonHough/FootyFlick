@@ -1,8 +1,3 @@
 using System;
+using UnityEngine.Serialization;
 
-[Serializable]
-public struct BallScoreData
-{
-    public ScoreType scoreType;
-    public GoalPostType goalPostCollisionType;
-}

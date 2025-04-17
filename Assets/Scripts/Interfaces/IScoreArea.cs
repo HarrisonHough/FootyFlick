@@ -1,15 +1,18 @@
 using System;
 
 [Serializable]
-public enum ScoreType
+public enum KickResult
 {
     None,
     OutOfBounds,
     Goal,
-    Point
+    Point,
+    HitGoalPost,
+    HitPointPost,
+    BinGoal
 }
 
 public interface IScoreArea
 {
-    public ScoreType ScoreType { get; }
+    public KickResult KickResult { get; }
 }
