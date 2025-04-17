@@ -8,9 +8,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private PlayerScore playerScore;
     [SerializeField]
-    private RandomPositionInSector randomPositionInSector;
+    private InputHandler inputHandler;
     [SerializeField]
-    private GameCanvas gameCanvas;
+    private RandomPositionInSector randomPositionInSector;
     [SerializeField]
     private GameModePrefabs gameModePrefabs;
     [SerializeField]
@@ -20,26 +20,49 @@ public class GameManager : MonoBehaviour
     public static Action<GameStateEnum> OnGameStateChanged;
     
     [SerializeField] private GameModeBase currentGameMode;
-    
+    public static GameStateEnum CurrentGameState { get; private set; } = GameStateEnum.Home;
     
     private void Start()
     {
         windControl = GetComponent<WindControl>();
+        OnGameStateChanged += HandleGameStateChanged;
+        MovePlayerToRandomPosition();
     }
+
 
     private void OnDestroy()
     {
         
     }
+    
+    public void SetSwipeDisabled(bool disabled)
+    {
+        inputHandler.SetSwipeDisabled(disabled);
+    }
+    
+    private void HandleGameStateChanged(GameStateEnum gameState)
+    {
+        switch (gameState)
+        {
+            case GameStateEnum.GameStarted:
+                break;
+            case GameStateEnum.Home:
+                if(currentGameMode != null)
+                {
+                    currentGameMode.EndMode();
+                    Destroy(currentGameMode.gameObject);
+                    currentGameMode = null;
+                }
+                break;
+            default:
+                break;
+        }
+    }
 
     public static void SetGameState(GameStateEnum gameState)
     {
-        OnGameStateChanged?.Invoke(gameState);
-    }
-
-    public GameCanvas GetGameCanvas()
-    {
-        return gameCanvas;
+        CurrentGameState = gameState;
+        OnGameStateChanged?.Invoke(CurrentGameState);
     }
     
     public PlayerScore GetPlayerScore()
@@ -63,6 +86,7 @@ public class GameManager : MonoBehaviour
         newGameMode = Instantiate(newGameMode, transform);
         currentGameMode = newGameMode;
         currentGameMode.Initialize(this);
+        SetSwipeDisabled(false);
     }
 
     public void StartGame()
@@ -70,7 +94,7 @@ public class GameManager : MonoBehaviour
         if (currentGameMode == null)
         {
             Debug.Log( "Game mode is null, setting default mode.");
-            SetGameMode(GameModeEnum.GoalOrNothing);
+            SetGameMode(GameModeEnum.Practice);
         }
         OnGameStateChanged?.Invoke(GameStateEnum.GameStarted);
         currentGameMode.StartMode();

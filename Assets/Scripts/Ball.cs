@@ -72,7 +72,11 @@ public class Ball : MonoBehaviour
     {
         SetWindActive(false);
         StopAllCoroutines();
-        poolMember.ReturnToPool(0);
+        if(poolMember != null)
+        {
+            poolMember.ReturnToPool(0);
+        }
+        
     }
     
     public void SetWindActive(bool active)

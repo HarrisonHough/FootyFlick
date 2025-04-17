@@ -36,6 +36,8 @@ public class InputHandler : MonoBehaviour
     public UnityEvent<Vector2> OnTapEvent;
     public UnityEvent<Vector2> OnHoldStartEvent;
     
+    private GameStateEnum gameState;
+    
     private void Awake()
     {
         inputActions = new GameInputActions();
@@ -87,7 +89,7 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-    public void SetSwipeDisable(bool value)
+    public void SetSwipeDisabled(bool value)
     {
         disableSwipeDetection = value;
     }
@@ -118,6 +120,7 @@ public class InputHandler : MonoBehaviour
 
     private void DetectGesture()
     {
+        
         Vector2 delta = endTouchPosition - startTouchPosition;
         float swipeDistance = delta.magnitude / Screen.height;
         float swipeDuration = endTime - startTime;

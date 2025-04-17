@@ -15,11 +15,11 @@ public class GoalOrNothingMode : GameModeBase
     {
         this.gameManager = gameManager;
         playerScore = gameManager.GetPlayerScore();
-        var gameCanvas = gameManager.GetGameCanvas();
         goalOrNothingGameOverPanel.gameObject.SetActive(false);
         goalOrNothingGameOverPanel.OnHomeButtonClicked += OnHomeButtonClicked;
         goalOrNothingGameOverPanel.OnRetryButtonClicked += OnRetryButtonClicked;
         Ball.OnKickComplete += OnKickResult;
+        WindControl.Instance.RandomizeWindStrength();
     }
 
     private void OnRetryButtonClicked()
@@ -36,8 +36,6 @@ public class GoalOrNothingMode : GameModeBase
 
     public override void StartMode()
     {
-        gameManager.MovePlayerToRandomPosition();
-        WindControl.Instance.RandomizeWindStrength();
         GameManager.SetGameState(GameStateEnum.GameKicking);
         goalOrNothingGameOverPanel.gameObject.SetActive(false);
         gameOver = false;
@@ -62,8 +60,6 @@ public class GoalOrNothingMode : GameModeBase
         goalOrNothingGameOverPanel.gameObject.SetActive(false);
         goalOrNothingGameOverPanel.OnHomeButtonClicked -= OnHomeButtonClicked;
         goalOrNothingGameOverPanel.OnRetryButtonClicked -= OnRetryButtonClicked;
-        Destroy(goalOrNothingGameOverPanel?.gameObject);
-        Destroy(gameScorePanel?.gameObject);
         Ball.OnKickComplete -= OnKickResult;
     }
     

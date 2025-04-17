@@ -66,7 +66,7 @@ public class PlayerScore : MonoBehaviour
             case KickResult.None:
                 break;
         }
-        playerScoreData.Accuracy = (float)playerScoreData.GoalCount / playerScoreData.KickCount;
+        playerScoreData.Accuracy = (float)playerScoreData.GoalCount / playerScoreData.KickCount * 100f;
 
         switch (kickData.Style)
         {

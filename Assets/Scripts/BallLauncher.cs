@@ -44,8 +44,25 @@ public class BallLauncher : MonoBehaviour
 
     private void OnGameStateChanged(GameStateEnum gameState)
     {
-        if (gameState != GameStateEnum.GameKicking) return; 
-        OnKickReady();
+        switch (gameState)
+        {
+            case GameStateEnum.GameStarted:
+                break;
+            case GameStateEnum.GameKicked:
+                break;
+            case GameStateEnum.GameKicking:
+                OnKickReady();
+                break;
+            case GameStateEnum.GameOver:
+                if (currentBall != null)
+                {
+                    currentBall.gameObject.SetActive(false);
+                    currentBall = null;
+                }
+                break;
+            default:
+                break;
+        }
         
     }
 

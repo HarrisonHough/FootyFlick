@@ -13,16 +13,17 @@ public class GameModeTimeAttack : GameModeBase
     private int score;
     private bool gameOver;
     private PlayerScore playerScore;
+    
     public override void Initialize(GameManager gameManager)
     {
         this.gameManager = gameManager;
         playerScore = gameManager.GetPlayerScore();
-        var gameCanvas = gameManager.GetGameCanvas();
         gameOverUI.OnHomeButtonClicked += OnHomeButtonClicked;
         gameOverUI.OnRetryButtonClicked += OnRetryButtonClicked;
         gameOverUI.gameObject.SetActive(false);
         gameOver = true;
         Ball.OnKickComplete += OnKickResult;
+        WindControl.Instance.RandomizeWindStrength();
     }
 
     private void OnRetryButtonClicked()
@@ -43,8 +44,6 @@ public class GameModeTimeAttack : GameModeBase
         timer = timeLimit;
         score = 0;
         gameOver = false;
-        gameManager.MovePlayerToRandomPosition();
-        WindControl.Instance.RandomizeWindStrength();
         gameScorePanel.gameObject.SetActive(true);
         gameOverUI.gameObject.SetActive(false);
         GameManager.SetGameState(GameStateEnum.GameKicking);
