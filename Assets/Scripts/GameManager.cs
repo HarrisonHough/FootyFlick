@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,8 +19,9 @@ public class GameManager : MonoBehaviour
     public WindControl WindControl => windControl;
     
     public static Action<GameStateEnum> OnGameStateChanged;
-    
-    [SerializeField] private GameModeBase currentGameMode;
+    public static Action<GameModeEnum> OnGameModeChanged;
+    private GameModeEnum currentGameMode;
+    [SerializeField] private GameModeBase currentGameModeObject;
     public static GameStateEnum CurrentGameState { get; private set; } = GameStateEnum.Home;
     
     private void Start()
@@ -47,11 +49,11 @@ public class GameManager : MonoBehaviour
             case GameStateEnum.GameStarted:
                 break;
             case GameStateEnum.Home:
-                if(currentGameMode != null)
+                if(currentGameModeObject != null)
                 {
-                    currentGameMode.EndMode();
-                    Destroy(currentGameMode.gameObject);
-                    currentGameMode = null;
+                    currentGameModeObject.EndMode();
+                    Destroy(currentGameModeObject.gameObject);
+                    currentGameModeObject = null;
                 }
                 break;
             default:
@@ -72,32 +74,33 @@ public class GameManager : MonoBehaviour
     
     public void SetGameMode(GameModeEnum modeEnum)
     {
-        if(currentGameMode != null)
+        currentGameMode = modeEnum;
+        if(currentGameModeObject != null)
         {
-            currentGameMode.EndMode();
-            Destroy(currentGameMode.gameObject);
+            currentGameModeObject.EndMode();
+            Destroy(currentGameModeObject.gameObject);
         }
-        var newGameMode = gameModePrefabs.GetGameMode(modeEnum);
+        var newGameMode = gameModePrefabs.GetGameMode(currentGameMode);
         if (newGameMode == null)
         {
-            Debug.LogError($"Game mode {modeEnum} not found.");
+            Debug.LogError($"Game mode {currentGameMode} not found.");
             return;
         }
         newGameMode = Instantiate(newGameMode, transform);
-        currentGameMode = newGameMode;
-        currentGameMode.Initialize(this);
+        currentGameModeObject = newGameMode;
+        currentGameModeObject.Initialize(this);
         SetSwipeDisabled(false);
+        OnGameModeChanged?.Invoke(currentGameMode);
     }
 
     public void StartGame()
     {
-        if (currentGameMode == null)
+        if (currentGameModeObject == null)
         {
-            Debug.Log( "Game mode is null, setting default mode.");
-            SetGameMode(GameModeEnum.Practice);
+            SetGameMode(currentGameMode);
         }
-        OnGameStateChanged?.Invoke(GameStateEnum.GameStarted);
-        currentGameMode.StartMode();
+        SetGameState(GameStateEnum.GameStarted);
+        currentGameModeObject.StartMode();
     }
     
     public void MovePlayerToRandomPosition()

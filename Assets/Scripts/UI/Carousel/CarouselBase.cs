@@ -3,32 +3,40 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class CarouselUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
+public class CarouselBase : MonoBehaviour, IBeginDragHandler, IEndDragHandler
 {
     [SerializeField] private RectTransform content;
     [SerializeField] private float panelWidth = 800f;
     [SerializeField] private float scrollDuration = 0.3f;
     [SerializeField] private Button leftButton;
     [SerializeField] private Button rightButton;
-
     private int currentIndex = 0;
     private int panelCount;
 
     private Vector2 dragStartPos;
 
-    private void Start()
+    protected virtual void Start()
+    {
+        SetupLayout();
+        
+        if(leftButton != null && rightButton != null)
+        {
+            leftButton.onClick.AddListener(() => Scroll(1));
+            rightButton.onClick.AddListener(() => Scroll(-1));
+        }
+
+        SnapToIndex(0);
+        UpdateButtons();
+    }
+
+    [ContextMenu("Setup Layout")]
+    public void SetupLayout()
     {
         panelCount = content.childCount;
         
         var firstPanel = content.GetChild(0).GetComponent<RectTransform>();
         var spacing = content.GetComponent<HorizontalLayoutGroup>()?.spacing ?? 0f;
         panelWidth = firstPanel.rect.width + spacing;
-
-        leftButton.onClick.AddListener(() => Scroll(1));
-        rightButton.onClick.AddListener(() => Scroll(-1));
-
-        SnapToIndex(1);
-        UpdateButtons();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -48,6 +56,12 @@ public class CarouselUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
             else if (deltaX > 0 && currentIndex > 0)
                 Scroll(-1); // swipe right = go left
         }
+    }
+
+    public void GoToNextPage()
+    {
+        if (currentIndex < panelCount - 1)
+            Scroll(1);
     }
 
     private void Scroll(int direction)
@@ -86,6 +100,7 @@ public class CarouselUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler
 
     private void UpdateButtons()
     {
+        if(leftButton == null || rightButton == null) return;
         rightButton.gameObject.SetActive(currentIndex > 0);
         leftButton.gameObject.SetActive(currentIndex < panelCount - 1);
     }

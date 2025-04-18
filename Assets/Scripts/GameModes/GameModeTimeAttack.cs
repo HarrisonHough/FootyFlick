@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class GameModeTimeAttack : GameModeBase
 {
+
     [SerializeField]
     private TimeAttackGameScorePanel gameScorePanel;
     [SerializeField]
@@ -16,6 +17,7 @@ public class GameModeTimeAttack : GameModeBase
     
     public override void Initialize(GameManager gameManager)
     {
+        base.Initialize(gameManager);
         this.gameManager = gameManager;
         playerScore = gameManager.GetPlayerScore();
         gameOverUI.OnHomeButtonClicked += OnHomeButtonClicked;
@@ -44,6 +46,7 @@ public class GameModeTimeAttack : GameModeBase
         timer = timeLimit;
         score = 0;
         gameOver = false;
+        gameCanvasObject.SetActive(true);
         gameScorePanel.gameObject.SetActive(true);
         gameOverUI.gameObject.SetActive(false);
         GameManager.SetGameState(GameStateEnum.GameKicking);

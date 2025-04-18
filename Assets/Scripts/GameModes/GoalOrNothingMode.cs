@@ -13,7 +13,7 @@ public class GoalOrNothingMode : GameModeBase
     
     public override void Initialize(GameManager gameManager)
     {
-        this.gameManager = gameManager;
+        base.Initialize(gameManager);
         playerScore = gameManager.GetPlayerScore();
         goalOrNothingGameOverPanel.gameObject.SetActive(false);
         goalOrNothingGameOverPanel.OnHomeButtonClicked += OnHomeButtonClicked;
@@ -39,6 +39,7 @@ public class GoalOrNothingMode : GameModeBase
         GameManager.SetGameState(GameStateEnum.GameKicking);
         goalOrNothingGameOverPanel.gameObject.SetActive(false);
         gameOver = false;
+        gameCanvasObject.SetActive(true);
     }
 
     public override void OnKickResult(KickData kickData)

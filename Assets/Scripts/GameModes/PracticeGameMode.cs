@@ -3,25 +3,17 @@ using UnityEngine;
 
 public class PracticeGameMode : GameModeBase
 {
-    private bool gameOver = false;
-    [SerializeField]
-    private TutorialPanel tutorialPanel;
     [SerializeField]
     private PracticeGameOverPanel gameOverPanel;
     private PlayerScore playerScore;
     
     public override void Initialize(GameManager gameManager)
-    {
-        playerScore = gameManager.GetPlayerScore();
-        this.gameManager = gameManager;
+    {        
+        base.Initialize(gameManager);
+        playerScore = this.gameManager.GetPlayerScore();
         Ball.OnKickComplete += OnKickResult;
         gameOverPanel.OnHomeButtonClicked += OnHomeButtonClicked;
         WindControl.Instance.RandomizeWindStrength();
-    }
-
-    public void SetPaused(bool paused)
-    {
-        gameManager.SetSwipeDisabled(paused);
     }
 
     private void OnHomeButtonClicked()
@@ -32,7 +24,7 @@ public class PracticeGameMode : GameModeBase
 
     public override void StartMode()
     {
-        GameManager.SetGameState(GameStateEnum.GameStarted);
+        gameCanvasObject.SetActive(true);
         GameManager.SetGameState(GameStateEnum.GameKicking);
     }
 
@@ -58,13 +50,7 @@ public class PracticeGameMode : GameModeBase
     public void GameOver()
     {
         gameOverPanel.gameObject.SetActive(true);
-        gameOver = true;
         GameManager.SetGameState(GameStateEnum.GameOver);
         gameOverPanel.UpdateText(playerScore.GetScoreData);
-    }
-
-    private void ShowTutorialComplete()
-    {
-        gameOver = true;
     }
 }

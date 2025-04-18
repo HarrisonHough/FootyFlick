@@ -1,5 +1,4 @@
 using UnityEngine;
-using DG.Tweening;
 using UnityEngine.Events;
 
 public class GameModePanel : CarouselElement
