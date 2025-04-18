@@ -36,6 +36,7 @@ public class GoalOrNothingMode : GameModeBase
 
     public override void StartMode()
     {
+        gameCanvasObject.SetActive(true);
         GameManager.SetGameState(GameStateEnum.GameKicking);
         goalOrNothingGameOverPanel.gameObject.SetActive(false);
         gameOver = false;

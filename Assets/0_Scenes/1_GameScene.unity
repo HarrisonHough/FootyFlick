@@ -912,7 +912,7 @@ MonoBehaviour:
   randomPositionInSector: {fileID: 567629647}
   gameModePrefabs: {fileID: 11400000, guid: a06f52b33f274674daa687eb77704cc5, type: 2}
   windControl: {fileID: 0}
-  currentGameMode: {fileID: 0}
+  currentGameModeObject: {fileID: 0}
 --- !u!1 &257950379
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,7 +7,6 @@ public class TimeAttackGameScorePanel : GameScorePanelBase
     
     public void UpdateTimer(float time)
     {
-        Debug.Log("Updating timer: " + time);
         timeText.text = time.ToString("0");
     }
 }

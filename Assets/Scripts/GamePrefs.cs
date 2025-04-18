@@ -4,7 +4,7 @@ public static class GamePrefs
 {
     private const string GOAL_OR_NOTHING_BEST_SCORE = "OnlySnags_BestScore";
     private const string GOAL_OR_NOTHING_TUTORIAL_COMPLETE = "OnlySnags_Tutorial_Complete";
-    private const string TIME_ATTACK_BEST_SCORE = "TimeAttack_Tutorial_Complete";
+    private const string TIME_ATTACK_BEST_SCORE = "TimeAttack_Tutorial_BestScore";
     private const string TIME_ATTACK_TUTORIAL_COMPLETE = "TimeAttack_Tutorial_Complete";
     private const string PRACTICE_TUTORIAL_COMPLETE = "Practice_Tutorial_Complete";
 

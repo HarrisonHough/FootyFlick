@@ -285,5 +285,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   windArrow: {fileID: 1916752970558218988}
-  windControl: {fileID: 0}
   animator: {fileID: 3001795774017974374}
