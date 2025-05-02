@@ -21,8 +21,8 @@ public class CarouselBase : MonoBehaviour, IBeginDragHandler, IEndDragHandler
         
         if(leftButton != null && rightButton != null)
         {
-            leftButton.onClick.AddListener(() => Scroll(1));
-            rightButton.onClick.AddListener(() => Scroll(-1));
+            leftButton.onClick.AddListener(() => Scroll(-1));
+            rightButton.onClick.AddListener(() => Scroll(1));
         }
 
         SnapToIndex(0);
@@ -101,7 +101,7 @@ public class CarouselBase : MonoBehaviour, IBeginDragHandler, IEndDragHandler
     private void UpdateButtons()
     {
         if(leftButton == null || rightButton == null) return;
-        rightButton.gameObject.SetActive(currentIndex > 0);
-        leftButton.gameObject.SetActive(currentIndex < panelCount - 1);
+        leftButton.gameObject.SetActive(currentIndex > 0);
+        rightButton.gameObject.SetActive(currentIndex < panelCount - 1);
     }
 }

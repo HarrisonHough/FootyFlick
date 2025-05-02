@@ -5581,8 +5581,8 @@ MonoBehaviour:
   content: {fileID: 911707301}
   panelWidth: 0
   scrollDuration: 0.3
-  leftButton: {fileID: 2042824242}
-  rightButton: {fileID: 1292724507}
+  leftButton: {fileID: 1292724507}
+  rightButton: {fileID: 2042824242}
 --- !u!1001 &1175195401
 PrefabInstance:
   m_ObjectHideFlags: 0
