@@ -7,7 +7,7 @@ public static class GamePrefs
     private const string TIME_ATTACK_BEST_SCORE = "TimeAttack_Tutorial_BestScore";
     private const string TIME_ATTACK_TUTORIAL_COMPLETE = "TimeAttack_Tutorial_Complete";
     private const string PRACTICE_TUTORIAL_COMPLETE = "Practice_Tutorial_Complete";
-
+    private const string PRACTICE_BEST_SCORE = "Practice_BestScore";
     
     public static int GetBestScore(GameModeEnum gameMode)
     {
@@ -17,6 +17,8 @@ public static class GamePrefs
                 return PlayerPrefs.GetInt(GOAL_OR_NOTHING_BEST_SCORE, 0);
             case GameModeEnum.TimeAttack:
                 return PlayerPrefs.GetInt(TIME_ATTACK_BEST_SCORE, 0);
+            case GameModeEnum.Practice:
+                return PlayerPrefs.GetInt(PRACTICE_BEST_SCORE, 0);
             default:
                 return 0;
         }
@@ -32,7 +34,11 @@ public static class GamePrefs
             case GameModeEnum.TimeAttack:
                 PlayerPrefs.SetInt(TIME_ATTACK_BEST_SCORE, score);
                 break;
+            case GameModeEnum.Practice:
+                PlayerPrefs.SetInt(PRACTICE_BEST_SCORE, score);
+                break;
         }
+        PlayerPrefs.Save();
     }
     
     public static bool GetTutorialComplete(GameModeEnum gameMode)
@@ -70,5 +76,17 @@ public static class GamePrefs
                 PlayerPrefs.SetInt(TIME_ATTACK_TUTORIAL_COMPLETE, 1);
                 break;
         }
+        PlayerPrefs.Save();
+    }
+    
+    public static bool IsGameModeUnlocked(GameModeEnum gameMode)
+    {
+        return gameMode switch
+        {
+            GameModeEnum.Practice => true,
+            GameModeEnum.TimeAttack => GetBestScore(GameModeEnum.Practice) >= 100,
+            GameModeEnum.GoalOrNothing => GetBestScore(GameModeEnum.TimeAttack) > 66,
+            _ => false
+        };
     }
 }
