@@ -29,9 +29,10 @@ public class Ball : MonoBehaviour
     public static Action<KickData> OnKickComplete;
     private PoolMember poolMember;
     private MeshRenderer ballRenderer;
-
+    
     private void Start()
     {
+        disableScoring = true;
         GameManager.OnGameStateChanged += OnGameStateChanged;
         ballRenderer = GetComponent<MeshRenderer>();
     }
@@ -93,7 +94,6 @@ public class Ball : MonoBehaviour
         disableScoring = false;
         ActivateRigidbody();
         ballRigidbody.linearVelocity = velocity;
-        
         Vector3 cameraRight = cameraTransform.right;
         cameraRight.y = 0;
         cameraRight.Normalize();
@@ -147,8 +147,7 @@ public class Ball : MonoBehaviour
 
     private void ApplyCurvingForce()
     {
-        var forceDirection = Quaternion.LookRotation(ballRigidbody.linearVelocity) * curvingForceDirection;
-        ballRigidbody.AddForce(forceDirection.normalized * curvingForceMagnitude, ForceMode.Force);
+        ballRigidbody.AddForce(curvingForceDirection.normalized * curvingForceMagnitude, ForceMode.Force);
     }
 
     private void ApplyWindForce()
@@ -178,7 +177,6 @@ public class Ball : MonoBehaviour
             }
             // delay check to ensure ball didn't hit post shortly after entering trigger
             StartCoroutine(DelayCheckForScore(0.05f));
-            
         }
     }
     
@@ -248,7 +246,14 @@ public class Ball : MonoBehaviour
         Debug.Log("BallScored!");
         OnKickComplete?.Invoke(currentKickData);
         disableScoring = true;
-        poolMember.ReturnToPool(1);
+        if(poolMember != null)
+        {
+            poolMember.ReturnToPool(3f);
+        }
+        else
+        {
+            Debug.LogWarning("Pool member is null!");
+        }
         StopAllCoroutines();
         SetWindActive(false);
     }

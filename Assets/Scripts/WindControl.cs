@@ -31,13 +31,19 @@ public class WindControl : MonoBehaviour
     public void RandomizeWindStrength()
     {
         windData.Force = UnityEngine.Random.Range(-windStrengthRange, windStrengthRange);
-        windData.Direction = cameraTransform.right.normalized;
+        SetWindDirection();
         OnWindChanged?.Invoke(windData);
     }
     
     public void SetWindStrength(float strength)
     {
         windData.Force = strength;
+        SetWindDirection();
+        OnWindChanged?.Invoke(windData);
+    }
+    
+    private void SetWindDirection()
+    {
         windData.Direction = cameraTransform.right.normalized;
         OnWindChanged?.Invoke(windData);
     }

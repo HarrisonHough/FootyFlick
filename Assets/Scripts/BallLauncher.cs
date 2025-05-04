@@ -27,7 +27,7 @@ public class BallLauncher : MonoBehaviour
     private Ball currentBall;
     public static Action OnBallLaunched;
     private Quaternion targetRotation;
-    private KickStyle currentKickStyle;
+    public KickStyle currentKickStyle { private set; get; }
     public UnityEvent OnBallTap;
 
     private static readonly Dictionary<KickStyle, Vector3> kickStyleRotations = new Dictionary<KickStyle, Vector3>
@@ -47,11 +47,10 @@ public class BallLauncher : MonoBehaviour
         switch (gameState)
         {
             case GameStateEnum.GameStarted:
-                break;
             case GameStateEnum.GameKicked:
                 break;
             case GameStateEnum.GameKicking:
-                OnKickReady();
+                KickReady();
                 break;
             case GameStateEnum.GameOver:
                 if (currentBall != null)
@@ -71,7 +70,7 @@ public class BallLauncher : MonoBehaviour
         GameManager.OnGameStateChanged -= OnGameStateChanged;
     }
 
-    private void OnKickReady()
+    public void KickReady()
     {
         if (currentBall == null) SpawnBall();
     }
@@ -109,7 +108,7 @@ public class BallLauncher : MonoBehaviour
         
         OnBallTap?.Invoke();
 
-        return;
+        //return;
         
         KickStyle[] styles = (KickStyle[])Enum.GetValues(typeof(KickStyle));
 
@@ -142,6 +141,7 @@ public class BallLauncher : MonoBehaviour
 
         if (swipeData.Distance > minVerticalSwipe)
         {
+            Debug.Log("Launch Ball");
             LaunchBall(swipeData);
             return;
         }

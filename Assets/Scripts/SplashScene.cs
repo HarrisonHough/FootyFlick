@@ -14,6 +14,12 @@ public class SplashScene : MonoBehaviour
     IEnumerator DelayLoadScene()
     {
         yield return new WaitForSeconds(displayTime);
-        SceneManager.LoadScene(1);
+        // TODO maybe make a separte bool for into tutorial
+        if (GamePrefs.GetTutorialComplete(GameModeEnum.Practice))
+        {
+            SceneManager.LoadScene(1);
+            yield break;
+        }
+        SceneManager.LoadScene(2);
     }
 }
