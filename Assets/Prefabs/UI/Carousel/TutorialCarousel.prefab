@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5011203632071002564}
   - component: {fileID: 9196730974492144838}
   - component: {fileID: 5909470566288013510}
+  - component: {fileID: 8229166616429858335}
   m_Layer: 0
   m_Name: TutorialCarousel
   m_TagString: Untagged
@@ -97,6 +98,19 @@ MonoBehaviour:
   scrollDuration: 0.3
   leftButton: {fileID: 4522188155600953577}
   rightButton: {fileID: 9101409493346954203}
+--- !u!114 &8229166616429858335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1264796499912009501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates: []
 --- !u!1 &5353736379429877935
 GameObject:
   m_ObjectHideFlags: 0

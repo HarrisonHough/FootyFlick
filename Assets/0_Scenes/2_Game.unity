@@ -5293,6 +5293,7 @@ GameObject:
   - component: {fileID: 1168417495}
   - component: {fileID: 1168417494}
   - component: {fileID: 1168417496}
+  - component: {fileID: 1168417497}
   m_Layer: 0
   m_Name: GameModeCarousel
   m_TagString: Untagged
@@ -5377,6 +5378,27 @@ MonoBehaviour:
   scrollDuration: 0.3
   leftButton: {fileID: 1292724507}
   rightButton: {fileID: 2042824242}
+--- !u!114 &1168417497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1168417492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 14
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 13
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &1201848853
 GameObject:
   m_ObjectHideFlags: 0
