@@ -12,12 +12,12 @@ public class ScoringTutorialStep : TutorialStep
 
         pointScored = false;
         var timeElapsed = 0f;
-        while (timeElapsed < 3f && !goalScored && !pointScored)
+        while (timeElapsed < 5f && !goalScored && !pointScored)
         {
             timeElapsed += Time.deltaTime;
             yield return null;
         }
-        SetText("Goals are worth 6 points!");
+        SetText("Try to kick a goal!");
         while (!goalScored)
         {
             yield return null;
