@@ -2,16 +2,23 @@ using UnityEngine;
 
 public class MenuCanvas : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject optionsPanel;
-
+    [SerializeField] private GameObject optionsPanel;
     [SerializeField] private GameObject homePanel;
-
+    [SerializeField] private GameObject SelectGameModePanel;
+    
+    private const string HAS_SHOWN_GAME_MODE_TUTORIAL = "HasShownGameModeTutorial";
+    
     private void Start()
     {
         GameManager.OnGameStateChanged += OnGameStateChanged;
         optionsPanel.SetActive(false);
         homePanel.SetActive(true);
+        SelectGameModePanel.SetActive(false);
+        if (!GamePrefs.GetBool(HAS_SHOWN_GAME_MODE_TUTORIAL))
+        {
+            SelectGameModePanel.SetActive(true);
+            GamePrefs.SetBool(HAS_SHOWN_GAME_MODE_TUTORIAL, true);
+        }
     }
 
     private void OnGameStateChanged(GameStateEnum gameState)

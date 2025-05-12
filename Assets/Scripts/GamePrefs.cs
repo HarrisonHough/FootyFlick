@@ -8,6 +8,7 @@ public static class GamePrefs
     private const string TIME_ATTACK_TUTORIAL_COMPLETE = "TimeAttack_Tutorial_Complete";
     private const string PRACTICE_TUTORIAL_COMPLETE = "Practice_Tutorial_Complete";
     private const string PRACTICE_BEST_SCORE = "Practice_BestScore";
+    private const string FIRST_TIME_GAME_SCENE = "FirstTimeGameScene";
     
     public static int GetBestScore(GameModeEnum gameMode)
     {
@@ -88,5 +89,16 @@ public static class GamePrefs
             GameModeEnum.GoalOrNothing => GetBestScore(GameModeEnum.TimeAttack) > 66,
             _ => false
         };
+    }
+    
+    public static bool GetBool(string key)
+    {
+        return PlayerPrefs.GetInt(key, 0) == 1;
+    }
+    
+    public static void SetBool(string key, bool value)
+    {
+        PlayerPrefs.SetInt(key, value ? 1 : 0);
+        PlayerPrefs.Save();
     }
 }

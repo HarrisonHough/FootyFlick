@@ -12,7 +12,7 @@ public class WindTutorialStep : TutorialStep
     {
         windPanel.gameObject.SetActive(true);
         windControl.SetWindStrength(3.5f);
-        SetText("Adjust your kick to account for the wind!");
+        SetText("Watch out for the wind!!");
         goalScored = false;
         while (!goalScored)
         {

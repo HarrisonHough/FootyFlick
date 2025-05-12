@@ -17,7 +17,7 @@ public class ScoringTutorialStep : TutorialStep
             timeElapsed += Time.deltaTime;
             yield return null;
         }
-        SetText("Try to kick a goal!");
+        SetText("Kick a goal!");
         while (!goalScored)
         {
             yield return null;
