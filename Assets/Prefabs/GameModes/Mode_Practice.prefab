@@ -2125,6 +2125,14 @@ PrefabInstance:
       propertyPath: m_Padding.m_Right
       value: 60
       objectReference: {fileID: 0}
+    - target: {fileID: 4160302911410020020, guid: a472dea3cb97000439e7b0c3b31eceea, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Close
+      objectReference: {fileID: 0}
+    - target: {fileID: 4160302911410020020, guid: a472dea3cb97000439e7b0c3b31eceea, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: TutorialCarousel, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 4553451880162304759, guid: a472dea3cb97000439e7b0c3b31eceea, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0

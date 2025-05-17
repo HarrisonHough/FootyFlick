@@ -11,6 +11,12 @@ public class WindPanel : MonoBehaviour
     {
         WindControl.OnWindChanged += OnWindChanged;
         BallLauncher.OnBallLaunched += OnBallLaunched;
+        WindData windData = new WindData
+        {
+            Force = WindControl.Instance.WindForce,
+            Direction = WindControl.Instance.WindDirection
+        };
+        OnWindChanged(windData);
     }
 
     private void OnDisable()
