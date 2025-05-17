@@ -5,6 +5,7 @@ public class MenuCanvas : MonoBehaviour
     [SerializeField] private GameObject optionsPanel;
     [SerializeField] private GameObject homePanel;
     [SerializeField] private GameObject SelectGameModePanel;
+    [SerializeField] private GameObject playButton;
     
     private const string HAS_SHOWN_GAME_MODE_TUTORIAL = "HasShownGameModeTutorial";
     
@@ -16,6 +17,7 @@ public class MenuCanvas : MonoBehaviour
         SelectGameModePanel.SetActive(false);
         if (!GamePrefs.GetBool(HAS_SHOWN_GAME_MODE_TUTORIAL))
         {
+            playButton.SetActive(false);
             SelectGameModePanel.SetActive(true);
             GamePrefs.SetBool(HAS_SHOWN_GAME_MODE_TUTORIAL, true);
         }
@@ -36,6 +38,7 @@ public class MenuCanvas : MonoBehaviour
             default:
                 break;
         }
+        playButton.SetActive(true);
     }
 
     private void OnDestroy()

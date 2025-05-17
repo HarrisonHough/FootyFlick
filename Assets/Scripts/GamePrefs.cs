@@ -8,8 +8,8 @@ public static class GamePrefs
     private const string TIME_ATTACK_TUTORIAL_COMPLETE = "TimeAttack_Tutorial_Complete";
     private const string PRACTICE_TUTORIAL_COMPLETE = "Practice_Tutorial_Complete";
     private const string PRACTICE_BEST_SCORE = "Practice_BestScore";
-    private const string FIRST_TIME_GAME_SCENE = "FirstTimeGameScene";
     
+    public const string TUTORIAL_COMPLETE_PREFS = "TutorialComplete";
     public static int GetBestScore(GameModeEnum gameMode)
     {
         switch (gameMode)

@@ -60,6 +60,7 @@ public class TutorialController : MonoBehaviour
 
     public void GoToGameScene()
     {
+        GamePrefs.SetBool(GamePrefs.TUTORIAL_COMPLETE_PREFS, true);
         StopAllCoroutines();
         SceneManager.LoadScene(2);
     }
