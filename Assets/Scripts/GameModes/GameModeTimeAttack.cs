@@ -71,7 +71,7 @@ public class GameModeTimeAttack : GameModeBase
         gameOverUI.gameObject.SetActive(false);
         gameScorePanel.gameObject.SetActive(false);
         gameOver = true;
-        GameManager.SetGameState(GameStateEnum.GameStarted);
+        GameManager.SetGameState(GameStateEnum.Home);
         gameOverUI.OnHomeButtonClicked -= OnHomeButtonClicked;
         gameOverUI.OnRetryButtonClicked -= OnRetryButtonClicked;
         Destroy(gameScorePanel.gameObject);

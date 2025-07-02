@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
@@ -21,7 +20,9 @@ public class GameManager : MonoBehaviour
     public static Action<GameStateEnum> OnGameStateChanged;
     public static Action<GameModeEnum> OnGameModeChanged;
     private GameModeEnum currentGameMode;
+    
     [SerializeField] private GameModeBase currentGameModeObject;
+    [SerializeField] private LevelPlayAdController adController;
     public static GameStateEnum CurrentGameState { get; private set; } = GameStateEnum.Home;
     
     private void Start()
@@ -29,12 +30,7 @@ public class GameManager : MonoBehaviour
         windControl = GetComponent<WindControl>();
         OnGameStateChanged += HandleGameStateChanged;
         MovePlayerToRandomPosition();
-    }
-
-
-    private void OnDestroy()
-    {
-        
+        adController.ShowBannerAd();
     }
     
     public void SetSwipeDisabled(bool disabled)
@@ -47,6 +43,8 @@ public class GameManager : MonoBehaviour
         switch (gameState)
         {
             case GameStateEnum.GameStarted:
+                adController.HideBannerAd();
+                adController.LoadInterstitialAd();
                 break;
             case GameStateEnum.Home:
                 if(currentGameModeObject != null)
@@ -55,6 +53,11 @@ public class GameManager : MonoBehaviour
                     Destroy(currentGameModeObject.gameObject);
                     currentGameModeObject = null;
                 }
+                adController.ShowBannerAd();
+                break;
+            case GameStateEnum.GameOver:
+                Debug.Log($"Showing interstitial ad for game over state.");
+                adController.ShowInterstitialAd();
                 break;
             default:
                 break;
@@ -112,7 +115,6 @@ public class GameManager : MonoBehaviour
     {
         player.MoveToPosition(position);
     }
-
 
 }
 
