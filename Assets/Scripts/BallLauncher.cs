@@ -216,6 +216,7 @@ public class BallLauncher : MonoBehaviour
         currentBall.LaunchBall(launchVelocity, currentKickStyle, camera.transform);
         currentBall = null;
         OnBallLaunched?.Invoke();
+        AudioController.Instance.PlaySFX(AudioId.Kick);
     }
 
     private void SpawnBall()

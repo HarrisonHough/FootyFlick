@@ -6,6 +6,7 @@ public class AudioController : GenericSingleton<AudioController>
     private AudioMixer audioMixer;
     private AudioSource musicSource;
     private AudioSource sfxSource;
+    private AudioLibrary audioLibrary;
     private const string SFX_GROUP = "SFX";
     private const string MUSIC_GROUP = "Music";
 
@@ -30,9 +31,13 @@ public class AudioController : GenericSingleton<AudioController>
         }
         if(musicSource == null)
         {
-            var musicSourcePrefab = Resources.Load<GameObject>("Audio/AudioSourceSFX");
+            var musicSourcePrefab = Resources.Load<GameObject>("Audio/AudioSourceMusic");
             musicSource = Instantiate(musicSourcePrefab).GetComponent<AudioSource>();
             musicSource.transform.SetParent(transform);
+        }
+        if(audioLibrary == null)
+        {
+            audioLibrary = Resources.Load<AudioLibrary>("Audio/AudioLibrary");
         }
     }
     
@@ -46,6 +51,37 @@ public class AudioController : GenericSingleton<AudioController>
     {
         Init();
         sfxSource.outputAudioMixerGroup.audioMixer.SetFloat(SFX_GROUP, muted ? -80 : 0);
+    }
+    
+    public void PlaySFX(AudioId audioId)
+    {
+        Init();
+        AudioClip clip = audioLibrary.GetAudioClip(audioId);
+        if (clip != null)
+        {
+            sfxSource.clip = clip;
+            sfxSource.Play();
+        }
+        else
+        {
+            Debug.LogWarning($"Audio clip for {audioId} not found in AudioLibrary.");
+        }
+    }
+
+    public void PlayMusic(AudioId audioId)
+    {
+        Init();
+        var clip = audioLibrary.GetAudioClip(audioId);
+        if (clip != null)
+        {
+            musicSource.clip = clip;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
+        else
+        {
+            Debug.LogWarning($"Audio clip for {audioId} not found in AudioLibrary.");
+        }
     }
     
     public void PlaySFX(AudioClip clip)

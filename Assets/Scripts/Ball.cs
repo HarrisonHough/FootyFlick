@@ -190,9 +190,11 @@ public class Ball : MonoBehaviour
             {
                 case GoalPostType.Goal:
                     currentKickData.Result = KickResult.HitGoalPost;
+                    AudioController.Instance.PlaySFX(AudioId.BallHitGoalPost);
                     break;
                 case GoalPostType.Point:
                     currentKickData.Result = KickResult.HitPointPost;
+                    AudioController.Instance.PlaySFX(AudioId.BallHitGoalPost);
                     break;
                 case GoalPostType.None: default:
                     Debug.Log("Goal post is none!");

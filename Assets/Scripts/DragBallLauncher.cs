@@ -101,6 +101,7 @@ public enum ControlMode { Swipe, Drag }
         ball.SetWindActive(true);
         ball = null;
         RandomizeWindStrength();
+        AudioController.Instance.PlaySFX(AudioId.Kick);
     }
 
     private float CalculateIdealLaunchForce()

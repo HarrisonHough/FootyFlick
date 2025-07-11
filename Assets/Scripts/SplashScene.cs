@@ -14,6 +14,7 @@ public class SplashScene : MonoBehaviour
     IEnumerator DelayLoadScene()
     {
         yield return new WaitForSeconds(displayTime);
+        AudioController.Instance.PlayMusic(AudioId.MusicLoop);
         if (GamePrefs.GetBool(GamePrefs.TUTORIAL_COMPLETE_PREFS))
         {
             SceneManager.LoadScene(2);
