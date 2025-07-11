@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 
-[CreateAssetMenu(fileName = "GameModePrefabs", menuName = "ScriptableObjects/GameModePrefabs", order = 1)]
+[CreateAssetMenu(fileName = "GameModePrefabs", menuName = "FlickFooty/Game Mode Prefabs", order = 1)]
 public class GameModePrefabs : ScriptableObject
 {
     [FormerlySerializedAs("practiceMode")] [FormerlySerializedAs("trainingMode"),FormerlySerializedAs("TutorialMode")] public PracticeGameMode practiceGameMode;
