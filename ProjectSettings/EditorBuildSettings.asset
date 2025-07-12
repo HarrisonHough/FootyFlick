@@ -6,13 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/0_Scenes/0_Splash.unity
+    path: Assets/FlickFooty/0_Scenes/0_Splash.unity
     guid: b3a7c8c4d8b96c843ba622534c81d093
   - enabled: 1
-    path: Assets/0_Scenes/1_Tutorial.unity
+    path: Assets/FlickFooty/0_Scenes/1_Tutorial.unity
     guid: 9af235da357c93942983baa11b35baae
   - enabled: 1
-    path: Assets/0_Scenes/2_Game.unity
+    path: Assets/FlickFooty/0_Scenes/2_Game.unity
     guid: 3494fc9cf478b0249b6c1711a3d42089
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
