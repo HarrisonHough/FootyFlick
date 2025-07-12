@@ -19,7 +19,7 @@ public class Ball : MonoBehaviour
     [SerializeField]
     private float curvingForceMagnitude = 5f;
     private Vector3 curvingForceDirection = Vector3.zero;
-    private Vector3 windDirection = new Vector3(1,0,0);
+    private Vector3 windDirection = new(1,0,0);
     private bool windActive;
     
     private bool disableScoring;
@@ -190,11 +190,9 @@ public class Ball : MonoBehaviour
             {
                 case GoalPostType.Goal:
                     currentKickData.Result = KickResult.HitGoalPost;
-                    AudioController.Instance.PlaySFX(AudioId.BallHitGoalPost);
                     break;
                 case GoalPostType.Point:
                     currentKickData.Result = KickResult.HitPointPost;
-                    AudioController.Instance.PlaySFX(AudioId.BallHitGoalPost);
                     break;
                 case GoalPostType.None: default:
                     Debug.Log("Goal post is none!");
