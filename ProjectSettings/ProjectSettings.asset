@@ -9,9 +9,9 @@ PlayerSettings:
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
   defaultScreenOrientation: 0
-  targetDevice: 2
+  targetDevice: 0
   useOnDemandResources: 0
-  accelerometerFrequency: 60
+  accelerometerFrequency: 0
   companyName: KangaruGames
   productName: FlickFooty
   defaultCursor: {fileID: 0}
@@ -165,7 +165,7 @@ PlayerSettings:
   androidMinAspectRatio: 1
   applicationIdentifier:
     Android: com.KangaruGames.FlickFooty
-    Standalone: com.Unity-Technologies.com.unity.template.urp-blank
+    Standalone: com.KangaruGames.FlickFooty
     iPhone: com.KangaruGames.FlickFooty
   buildNumber:
     Standalone: 0
