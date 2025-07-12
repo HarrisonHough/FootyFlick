@@ -3,9 +3,10 @@ using UnityEngine;
 public enum AudioId
 {
     Kick,
-    Goal,
+    Score,
     BallHitGoalPost,
-    MusicLoop
+    MusicLoop,
+    Fail
 }
 
 [CreateAssetMenu(fileName = "AudioLibrary", menuName = "FlickFooty/Audio Library")]
@@ -26,7 +27,7 @@ public class AudioLibrary : ScriptableObject
         {
             case AudioId.Kick:
                 return kickClip;
-            case AudioId.Goal:
+            case AudioId.Score:
                 return goalClip;
             case AudioId.BallHitGoalPost:
                 return ballHitGoalPostClip;

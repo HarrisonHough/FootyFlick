@@ -33,7 +33,16 @@ public class TutorialController : MonoBehaviour
     private void OnKickComplete(KickData kickData)
     {
         currentStep.OnKickComplete(kickData);
-        if (kickData.Result == KickResult.Goal && currentStep is KickStyleTutorialStep) return;
+        switch (kickData.Result)
+        {
+            case KickResult.OutOfBounds: case KickResult.HitPointPost:
+                AudioController.Instance.PlaySFX(AudioId.Fail);
+                break;
+            default:
+                AudioController.Instance.PlaySFX(AudioId.Score);
+                break;
+        }
+        if (kickData.Result == KickResult.Goal && currentStep is KickStyleTutorialStep) {return;}
         StartCoroutine( DelayNextBallSpawn(1f));
     }
 

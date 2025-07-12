@@ -49,11 +49,11 @@ public class PlayerScore : MonoBehaviour
             case KickResult.Goal:
                 playerScoreData.GoalCount++;
                 AddToScore(6);
-                AudioController.Instance.PlaySFX( AudioId.Goal);
+                AudioController.Instance.PlaySFX(AudioId.Score);
                 break;
             case KickResult.Point:
                 playerScoreData.PointCount++;
-                AudioController.Instance.PlaySFX(AudioId.Goal);
+                AudioController.Instance.PlaySFX(AudioId.Score);
                 AddToScore(1);
                 break;
             case KickResult.OutOfBounds:
