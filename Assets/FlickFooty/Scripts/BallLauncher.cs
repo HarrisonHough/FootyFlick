@@ -28,7 +28,7 @@ public class BallLauncher : MonoBehaviour
     public static Action OnBallLaunched;
     private Quaternion targetRotation;
     public KickStyle currentKickStyle { private set; get; }
-    public UnityEvent OnBallTap;
+    public static Action OnBallTap;
 
     private static readonly Dictionary<KickStyle, Vector3> kickStyleRotations = new Dictionary<KickStyle, Vector3>
     {
@@ -36,6 +36,18 @@ public class BallLauncher : MonoBehaviour
         { KickStyle.SnapLeft, new Vector3(33, 130, 0) },
         { KickStyle.SnapRight, new Vector3(33, -130, 0) }
     };
+
+    private void OnEnable()
+    {
+        InputHandler.OnSwipeEvent += OnSwipeDetected;
+        InputHandler.OnTapEvent += OnTap;
+    }
+
+    private void OnDisable()
+    {
+        InputHandler.OnSwipeEvent -= OnSwipeDetected;
+        InputHandler.OnTapEvent -= OnTap;
+    }
 
     private void Start()
     {

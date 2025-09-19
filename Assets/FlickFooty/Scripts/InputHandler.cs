@@ -31,10 +31,10 @@ public class InputHandler : MonoBehaviour
     private bool isHolding = false;
     private bool holdTriggered = false;
 
-    public UnityEvent<SwipeData> OnSwipeEvent;
-    public UnityEvent<Vector2> OnReverseSwipeEvent; 
-    public UnityEvent<Vector2> OnTapEvent;
-    public UnityEvent<Vector2> OnHoldStartEvent;
+    public static Action<SwipeData> OnSwipeEvent;
+    public static Action<Vector2> OnReverseSwipeEvent; 
+    public static Action<Vector2> OnTapEvent;
+    public static Action<Vector2> OnHoldStartEvent;
     
     private GameStateEnum gameState;
     
