@@ -196,9 +196,9 @@ public class LevelPlaySample : MonoBehaviour
         Debug.Log($"[LevelPlaySample] Received RewardedVideoOnAdDisplayedEvent With AdInfo: {adInfo}");
     }
 #pragma warning disable 0618
-    void RewardedVideoOnAdDisplayedFailedEvent(LevelPlayAdDisplayInfoError error)
+    void RewardedVideoOnAdDisplayedFailedEvent(LevelPlayAdInfo adInfo, LevelPlayAdError adInfoError)
     {
-        Debug.Log($"[LevelPlaySample] Received RewardedVideoOnAdDisplayedFailedEvent With Error: {error}");
+        Debug.Log($"[LevelPlaySample] Received RewardedVideoOnAdDisplayedFailedEvent With Error: {adInfoError}");
     }
 #pragma warning restore 0618
     void RewardedVideoOnAdRewardedEvent(LevelPlayAdInfo adInfo, LevelPlayReward reward)
@@ -239,9 +239,9 @@ public class LevelPlaySample : MonoBehaviour
         Debug.Log($"[LevelPlaySample] Received InterstitialOnAdDisplayedEvent With AdInfo: {adInfo}");
     }
 #pragma warning disable 0618
-    void InterstitialOnAdDisplayFailedEvent(LevelPlayAdDisplayInfoError infoError)
+    void InterstitialOnAdDisplayFailedEvent(LevelPlayAdInfo adInfo, LevelPlayAdError adInfoError)
     {
-        Debug.Log($"[LevelPlaySample] Received InterstitialOnAdDisplayFailedEvent With InfoError: {infoError}");
+        Debug.Log($"[LevelPlaySample] Received InterstitialOnAdDisplayFailedEvent With InfoError: {adInfoError}");
     }
 #pragma warning restore 0618
     void InterstitialOnAdClickedEvent(LevelPlayAdInfo adInfo)
@@ -283,7 +283,7 @@ public class LevelPlaySample : MonoBehaviour
         Debug.Log($"[LevelPlaySample] Received BannerOnAdDisplayedEvent With AdInfo: {adInfo}");
     }
 #pragma warning disable 0618
-    void BannerOnAdDisplayFailedEvent(LevelPlayAdDisplayInfoError adInfoError)
+    void BannerOnAdDisplayFailedEvent(LevelPlayAdInfo adInfo, LevelPlayAdError adInfoError)
     {
         Debug.Log($"[LevelPlaySample] Received BannerOnAdDisplayFailedEvent With AdInfoError: {adInfoError}");
     }
