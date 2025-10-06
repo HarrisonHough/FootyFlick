@@ -15,20 +15,16 @@ public class Ball : MonoBehaviour
     [SerializeField]
     private float maxBallLifeTime = 3f;
     [SerializeField]
-    private float magnusCoefficient = 0.1f; // Adjust this value to fine-tune the Magnus effect
-    [SerializeField]
     private float curvingForceMagnitude = 5f;
     private Vector3 curvingForceDirection = Vector3.zero;
     private Vector3 windDirection = new(1,0,0);
     private bool windActive;
-    
     private bool disableScoring;
-    
-
     private KickData currentKickData;
     public static Action<KickData> OnKickComplete;
     private PoolMember poolMember;
     private MeshRenderer ballRenderer;
+    private Vector3 scoreCollisionPoint;
     
     private void Start()
     {
@@ -77,7 +73,6 @@ public class Ball : MonoBehaviour
         {
             poolMember.ReturnToPool(0);
         }
-        
     }
     
     public void SetWindActive(bool active)
@@ -163,6 +158,7 @@ public class Ball : MonoBehaviour
         if (other.gameObject.TryGetComponent(out IScoreArea score))
         {
             currentKickData.Result = score.KickResult;
+            currentKickData.CollisionPoint = other.ClosestPoint(transform.position);
             switch (score.KickResult)
             {
                 case KickResult.OutOfBounds:

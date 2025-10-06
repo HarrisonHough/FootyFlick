@@ -35,18 +35,12 @@ public class GenericSingleton<T> : MonoBehaviour where T : Component
             instance = this as T;
             if (!destroyOnLoad)
             {
-                //Debug.Log($"{gameObject.name} Will NOT destroy on load");
                 DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                //Debug.Log($"{gameObject.name} Will destroy on load");
             }
         }
         else if (instance != this)
         {
             Destroy(gameObject);
-            return;
         }
     }
 }

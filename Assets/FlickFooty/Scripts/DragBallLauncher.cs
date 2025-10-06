@@ -1,12 +1,11 @@
 using UnityEngine;
 using System;
-using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 
 public class DragBallLauncher : MonoBehaviour
 {
-public enum ControlMode { Swipe, Drag }
+    public enum ControlMode { Swipe, Drag }
 
     [SerializeField] private Ball ballPrefab;
     [SerializeField] private Transform target;

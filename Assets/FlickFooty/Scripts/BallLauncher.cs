@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
@@ -17,7 +16,7 @@ public enum KickStyle
 public class BallLauncher : MonoBehaviour
 {
     [SerializeField] private Transform ballParent;
-    [SerializeField] private Camera camera;
+    [SerializeField] private Camera gameCamera;
     [SerializeField] private float launchAngle = 45f;
     [SerializeField] private float maxLaunchForce = 10f;
     [SerializeField] private float maxSwipeDistance = 0.5f; // Proportion of screen height
@@ -71,8 +70,6 @@ public class BallLauncher : MonoBehaviour
                     currentBall = null;
                 }
                 break;
-            default:
-                break;
         }
         
     }
@@ -92,7 +89,7 @@ public class BallLauncher : MonoBehaviour
         if (IsPointerOverUIObject())
             return; 
 
-        Ray ray = camera.ScreenPointToRay(screenPosition);
+        Ray ray = gameCamera.ScreenPointToRay(screenPosition);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
             if (hit.collider.CompareTag("Ball"))
@@ -119,8 +116,6 @@ public class BallLauncher : MonoBehaviour
         Debug.Log("Ball was tapped!");
         
         OnBallTap?.Invoke();
-
-        //return;
         
         KickStyle[] styles = (KickStyle[])Enum.GetValues(typeof(KickStyle));
 
@@ -155,7 +150,6 @@ public class BallLauncher : MonoBehaviour
         {
             Debug.Log("Launch Ball");
             LaunchBall(swipeData);
-            return;
         }
     }
 
@@ -197,12 +191,12 @@ public class BallLauncher : MonoBehaviour
         var launchForce = (distanceFactor + speedFactor) * 0.5f * maxLaunchForce;
 
         // Get the camera's forward direction, ignoring the y component
-        var cameraForward = camera.gameObject.transform.forward;
+        var cameraForward = gameCamera.gameObject.transform.forward;
         cameraForward.y = 0;
         cameraForward.Normalize();
 
         // Get the camera's right direction
-        var cameraRight = camera.gameObject.transform.right;
+        var cameraRight = gameCamera.gameObject.transform.right;
 
         // Calculate the launch direction relative to the camera's orientation
         var launchDirection = (cameraRight * swipeData.SwipeVector.x + cameraForward * swipeData.SwipeVector.y).normalized;
@@ -225,7 +219,7 @@ public class BallLauncher : MonoBehaviour
         }
         GameManager.SetGameState(GameStateEnum.GameKicked);
         currentBall.transform.parent = null;
-        currentBall.LaunchBall(launchVelocity, currentKickStyle, camera.transform);
+        currentBall.LaunchBall(launchVelocity, currentKickStyle, gameCamera.transform);
         currentBall = null;
         OnBallLaunched?.Invoke();
         AudioController.Instance.PlaySFX(AudioId.Kick);

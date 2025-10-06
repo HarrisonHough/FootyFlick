@@ -26,10 +26,10 @@ public class InputHandler : MonoBehaviour
     private Vector2 endTouchPosition;
     private float startTime;
     private float endTime;
-    private bool isSwiping = false;
-    private bool disableSwipeDetection = false;
-    private bool isHolding = false;
-    private bool holdTriggered = false;
+    private bool isSwiping;
+    private bool disableSwipeDetection;
+    private bool isHolding;
+    private bool holdTriggered;
 
     public static Action<SwipeData> OnSwipeEvent;
     public static Action<Vector2> OnReverseSwipeEvent; 

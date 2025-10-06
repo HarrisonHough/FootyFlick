@@ -48,17 +48,13 @@ public static class GamePrefs
         {
             case GameModeEnum.Practice:
                 return PlayerPrefs.GetInt(PRACTICE_TUTORIAL_COMPLETE, 0) == 1;
-                break;
             case GameModeEnum.GoalOrNothing:
                 return PlayerPrefs.GetInt(GOAL_OR_NOTHING_TUTORIAL_COMPLETE, 0) == 1;
-                break;
             case GameModeEnum.TimeAttack:
                 return PlayerPrefs.GetInt(TIME_ATTACK_TUTORIAL_COMPLETE, 0) == 1;
-                break;
             default:
                 Debug.LogError($"Game mode {gameMode} not found.");
                 return false;
-                break;
         }
     }
 
