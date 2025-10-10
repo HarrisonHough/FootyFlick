@@ -76,3 +76,21 @@ crashlytics-build.properties
 
 .utmp/
 *.blend1
+
+Assets/Feel/FeelDemos/
+
+Assets/Feel/FeelDemosHDRP/
+
+Assets/Feel/FeelDemosURP/
+
+Assets/Feel/MMFeedbacks/Demos/
+
+Assets/Feel/MMTools/Demos/
+
+Assets/Feel/NiceVibrations/Demo/
+
+Assets/Feel/MMTools/Demos.meta
+
+Assets/Feel/MMFeedbacks/Demos.meta
+
+Assets/Feel/NiceVibrations/Demo.meta
