@@ -58,6 +58,7 @@ public class PlayerScore : MonoBehaviour
                 break;
             case KickResult.OutOfBounds:
                 playerScoreData.OutOfBoundsCount++;
+                AudioController.Instance.PlaySFX(AudioId.OutOfBounds);
                 break;
             case KickResult.HitGoalPost:
                 playerScoreData.HitGoalPostCount++;
@@ -68,6 +69,7 @@ public class PlayerScore : MonoBehaviour
                 AudioController.Instance.PlaySFX( AudioId.BallHitGoalPost);
                 break;
             case KickResult.None:
+                AudioController.Instance.PlaySFX(AudioId.OutOfBounds);
                 break;
         }
         playerScoreData.Accuracy = (float)playerScoreData.GoalCount / playerScoreData.KickCount * 100f;

@@ -6,10 +6,11 @@ using UnityEngine.Audio;
 
 public class AudioController : GenericSingleton<AudioController>
 {
+    [SerializeField]
+    private AudioLibrary audioLibrary;
     private AudioMixer audioMixer;
     private AudioSource musicSource;
     private AudioSource sfxSource;
-    private AudioLibrary audioLibrary;
     private const string SFX_GROUP = "SFX";
     private const string MUSIC_GROUP = "Music";
 

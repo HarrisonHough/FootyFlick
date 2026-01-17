@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 377d0680d7b220647855cfb66dcf12e3, type: 3}
   m_Name: AudioLibrary
   m_EditorClassIdentifier: 
-  kickClip: {fileID: 8300000, guid: c3806df6f3a9730458ac3fd606d65201, type: 3}
+  kickClips:
+  - {fileID: 8300000, guid: f282f4d12bb9f194fb3582cac7e63035, type: 3}
+  - {fileID: 8300000, guid: 1c1ebefc09ffcae49bd3cdc4be57ab1d, type: 3}
+  - {fileID: 8300000, guid: fc3ba7a3ac06e3c429776a54119b91a5, type: 3}
   goalClip: {fileID: 8300000, guid: 8c728d78d51f08a4580a9897ebcda6de, type: 3}
-  ballHitGoalPostClip: {fileID: 8300000, guid: 4e28b1da85b9c7942a2181eec0637b10, type: 3}
+  ballHitGoalPostClips:
+  - {fileID: 8300000, guid: 71fe6c6e6d7dd0748b2b255ce55d0918, type: 3}
+  - {fileID: 8300000, guid: c774e5aae48490245a7635ffcae80c4b, type: 3}
   musicLoopClip: {fileID: 8300000, guid: 0fea34fef2cebb44989a079a7819f368, type: 3}
+  outOfBoundsClip: {fileID: 8300000, guid: 76993c4b2b0995a42ad708f5514525ce, type: 3}

@@ -270,6 +270,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destroyOnLoad: 0
+  audioLibrary: {fileID: 11400000, guid: b04a56b8e924b18449a741bf1dc6b06f, type: 2}
 --- !u!4 &566711824
 Transform:
   m_ObjectHideFlags: 0
