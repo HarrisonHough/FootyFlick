@@ -2597,7 +2597,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ballParent: {fileID: 1731485557}
-  gameCamera: {fileID: 0}
+  gameCamera: {fileID: 330585545}
   launchAngle: 45
   maxLaunchForce: 16
   maxSwipeDistance: 0.7

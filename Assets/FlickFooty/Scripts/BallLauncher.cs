@@ -106,7 +106,7 @@ public class BallLauncher : MonoBehaviour
         {
             position = Pointer.current.position.ReadValue()
         };
-        var results = new System.Collections.Generic.List<RaycastResult>();
+        var results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
         return results.Count > 0;
     }
