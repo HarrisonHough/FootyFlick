@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[SerializeField]
+[System.Serializable]
 public struct WindData
 {
     public float Force;
